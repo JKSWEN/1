@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>末日三十天 - 完整网页版文字生存游戏</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        apocalypse: {
+                            950: '#07090e',
+                            900: '#0d1117',
+                            800: '#161b22',
+                            700: '#21262d',
+                            600: '#30363d',
+                            accent: '#d97706',
+                            danger: '#dc2626',
+                            warning: '#ea580c',
+                            safe: '#059669',
+                            tech: '#0284c7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+                        mono: ['Consolas', 'Monaco', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom scrollbar styling for immersive dark UI */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #07090e; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+        .text-glow { text-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
+        .text-glow-red { text-shadow: 0 0 8px rgba(220, 38, 38, 0.6); }
+        .fade-in { animation: fadeIn 0.35s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .alert-pulse { animation: pulseRed 1.2s infinite ease-in-out; }
+        @keyframes pulseRed { 0%, 100% { border-color: rgba(220, 38, 38, 0.4); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 50% { border-color: rgba(220, 38, 38, 1); box-shadow: 0 0 12px 2px rgba(220, 38, 38, 0.6); } }
+    </style>
+</head>
+<body class="bg-apocalypse-950 text-zinc-200 font-sans min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+
+    <!-- TOP HEADER: Quick Global Bar for Mobile / Compact Navigation -->
+    <header class="bg-apocalypse-900 border-b border-apocalypse-700/80 px-4 py-2 sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="text-amber-500 font-bold text-base sm:text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-biohazard text-amber-500 animate-pulse"></i> 末日三十天
+                </span>
+                <span class="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 hidden sm:inline">完整生存版</span>
+            </div>
+            
+            <!-- Quick Mobile Panel Toggles -->
+            <div id="mobile-sidebar-toggles" class="hidden items-center gap-2 text-xs">
+                <button onclick="toggleMobileSidebar('left')" class="px-2.5 py-1 bg-apocalypse-800 border border-apocalypse-600 rounded text-amber-400 font-semibold">
+                    <i class="fa-solid fa-box-open mr-1"></i>背包
+                </button>
+                <button onclick="toggleMobileSidebar('right')" class="px-2.5 py-1 bg-apocalypse-800 border border-apocalypse-600 rounded text-emerald-400 font-semibold">
+                    <i class="fa-solid fa-chart-simple mr-1"></i>状态
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- RED CRITICAL WARNING INTERRUPT MODAL -->
+    <div id="red-warning-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-apocalypse-900 border-2 border-rose-600 rounded-xl max-w-md w-full p-6 shadow-2xl text-center space-y-4 fade-in alert-pulse">
+            <div class="text-rose-500 text-5xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="text-xl font-bold text-rose-500 tracking-wide text-glow-red">生存警告：身体状态跌破安全阈值！</h3>
+            <p id="red-warning-msg" class="text-sm text-zinc-300 leading-relaxed">您的生命体征跌破安全线！请立刻使用左侧背包补水、进食或睡眠休整！</p>
+            <button onclick="closeRedWarning()" class="w-full py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-lg transition shadow-lg">
+                <i class="fa-solid fa-kit-medical mr-2"></i>立即返回并救治
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN GAME LAYOUT: 3-COLUMN GRID SYSTEM (Desktop: Left 3 | Center 6 | Right 3) -->
+    <div class="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+        <!-- ================= LEFT COLUMN: REAL-TIME INVENTORY & DIRECT USE PANEL ================= -->
+        <aside id="sidebar-left" class="lg:col-span-3 hidden flex-col bg-apocalypse-900 border border-apocalypse-700/80 rounded-xl p-3 shadow-xl space-y-3 max-h-[88vh] sticky top-14 overflow-hidden">
+            <div class="flex justify-between items-center border-b border-apocalypse-700 pb-2">
+                <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-boxes-packing text-amber-500"></i> 背包与物资直用
+                </h3>
+                <span id="inv-capacity-tag" class="text-xs text-zinc-400 font-mono">容量: 3/20</span>
+            </div>
+
+            <!-- Category Filter Tabs -->
+            <div class="flex gap-1 text-xs">
+                <button onclick="filterInventory('all')" id="inv-tab-all" class="flex-1 py-1 rounded bg-amber-600 text-zinc-950 font-bold text-center">全部</button>
+                <button onclick="filterInventory('food')" id="inv-tab-food" class="flex-1 py-1 rounded bg-apocalypse-800 text-zinc-400 hover:text-zinc-200 text-center">食/水</button>
+                <button onclick="filterInventory('medical')" id="inv-tab-medical" class="flex-1 py-1 rounded bg-apocalypse-800 text-zinc-400 hover:text-zinc-200 text-center">医疗</button>
+                <button onclick="filterInventory('tool')" id="inv-tab-tool" class="flex-1 py-1 rounded bg-apocalypse-800 text-zinc-400 hover:text-zinc-200 text-center">工具</button>
+            </div>
+
+            <!-- Direct Usable Items List -->
+            <div id="left-inventory-list" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
+                <!-- Dynamically Rendered with Direct "使用" buttons -->
+            </div>
+
+            <!-- Inventory Bottom Capacity & Warehouse Quick Trigger -->
+            <div class="pt-2 border-t border-apocalypse-700/80 space-y-2">
+                <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-700">
+                    <div id="inv-capacity-bar" class="bg-amber-500 h-full rounded-full transition-all" style="width: 15%;"></div>
+                </div>
+                <button onclick="openPanel('warehouse')" class="w-full py-1.5 bg-apocalypse-800 hover:bg-apocalypse-700 border border-apocalypse-600 rounded text-xs text-sky-400 font-bold transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-warehouse"></i> 快速调取庇护所仓库
+                </button>
+            </div>
+        </aside>
+
+        <!-- ================= CENTER COLUMN: MAIN NARRATIVE & INTERACTION HALL ================= -->
+        <main class="lg:col-span-6 flex flex-col space-y-4">
+
+            <!-- STEP 0: Initial Stutter Greeting & Notices -->
+            <section id="sec-intro" class="space-y-4 fade-in">
+                <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-5 shadow-xl space-y-4">
+                    <div class="border-b border-apocalypse-700 pb-3">
+                        <h1 class="text-xl sm:text-2xl font-bold text-amber-500 flex items-center gap-2">
+                            <i class="fa-solid fa-biohazard"></i>《末日三十天》生存启动
+                        </h1>
+                    </div>
+                    <div class="text-sm sm:text-base text-zinc-300 font-mono leading-relaxed bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-700/80">
+                        <span id="stutter-text" class="text-amber-400 font-semibold">好……你好……欢迎进入《末日三十天》生存模拟系统……~</span>
+                    </div>
+                    <div class="space-y-2">
+                        <h2 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">核心注意事项：</h2>
+                        <ul class="space-y-2 text-xs sm:text-sm text-zinc-300">
+                            <li class="bg-apocalypse-950 p-2.5 rounded border border-apocalypse-800 flex items-start gap-2">
+                                <span class="text-rose-500 font-bold">⚠️ [细思极恐提醒]</span>
+                                <span>无血腥恐怖画面，但包含深层未知环境压迫与人性道德博弈。</span>
+                            </li>
+                            <li class="bg-apocalypse-950 p-2.5 rounded border border-apocalypse-800 flex items-start gap-2">
+                                <span class="text-amber-500 font-bold">🛠️ [玩法提醒]</span>
+                                <span>资源极度紧缺，行动按现实规则扣除时间与消耗。抉择将永久改变命运。</span>
+                            </li>
+                            <li class="bg-apocalypse-950 p-2.5 rounded border border-apocalypse-800 flex items-start gap-2">
+                                <span class="text-emerald-500 font-bold">📜 [合规提醒]</span>
+                                <span>虚构末日架空背景，自私选项仅限自保，绝不生成伤害谋害他人的分支。</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <button onclick="goToCharCreation()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-sm sm:text-base shadow-lg">
+                        开始创建生存角色 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 1: Character Creation (Table Form) -->
+            <section id="sec-char-create" class="hidden space-y-4 fade-in">
+                <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
+                    <h2 class="text-lg font-bold text-amber-500 flex items-center gap-2 border-b border-apocalypse-700 pb-2">
+                        <i class="fa-solid fa-user-gear"></i> 六项基础人设创建
+                    </h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm text-zinc-300 border-collapse">
+                            <thead>
+                                <tr class="bg-apocalypse-950 text-amber-400 border-b border-apocalypse-700">
+                                    <th class="p-2.5 w-24">项目</th>
+                                    <th class="p-2.5">自定义选择与详细优缺点注释</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-apocalypse-800">
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-zinc-200">1. 姓名</td>
+                                    <td class="p-2.5">
+                                        <input type="text" id="input-name" value="陈默" class="bg-apocalypse-950 border border-apocalypse-600 rounded px-3 py-1.5 w-full max-w-xs focus:outline-none focus:border-amber-500 text-amber-300" placeholder="请输入你的主角姓名">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-zinc-200">2. 性别</td>
+                                    <td class="p-2.5">
+                                        <div class="flex gap-4">
+                                            <label class="cursor-pointer flex items-center gap-1"><input type="radio" name="gender" value="男" checked class="accent-amber-500"> 男 (适配体力剧情)</label>
+                                            <label class="cursor-pointer flex items-center gap-1"><input type="radio" name="gender" value="女" class="accent-amber-500"> 女 (适配感知剧情)</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-zinc-200">3. 年龄</td>
+                                    <td class="p-2.5">
+                                        <select id="select-age" class="bg-apocalypse-950 border border-apocalypse-600 rounded px-2.5 py-1.5 text-zinc-200 text-xs sm:text-sm focus:outline-none focus:border-amber-500">
+                                            <option value="18-22岁">18-22岁 (体力充沛，但处事不够稳重)</option>
+                                            <option value="23-30岁" selected>23-30岁 (各项能力均衡，具备基础经验)</option>
+                                            <option value="30岁以上">30岁以上 (处事稳重经验丰富，体力稍逊)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-zinc-200">4. 居住陪伴</td>
+                                    <td class="p-2.5">
+                                        <select id="select-living" class="bg-apocalypse-950 border border-apocalypse-600 rounded px-2.5 py-1.5 text-zinc-200 text-xs sm:text-sm focus:outline-none focus:border-amber-500">
+                                            <option value="独居">独居 (自由独立，但缺少初期协助)</option>
+                                            <option value="普通朋友同住">普通朋友同住 (有人搭照，但资源需分担)</option>
+                                            <option value="死党同住">死党同住 (信任度高，开局相互扶持)</option>
+                                            <option value="父母同住">父母同住 (情感寄托，庇护压力极大)</option>
+                                            <option value="大家族同住">大家族同住 (人多力量大，物资极度紧缺)</option>
+                                            <option value="伴侣同住" selected>伴侣同住 (羁绊深厚，情感依赖高)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-zinc-200">5. 家庭条件</td>
+                                    <td class="p-2.5">
+                                        <select id="select-wealth" class="bg-apocalypse-950 border border-apocalypse-600 rounded px-2.5 py-1.5 text-zinc-200 text-xs sm:text-sm focus:outline-none focus:border-amber-500">
+                                            <option value="普通家境">普通家境 (初始资金基础，普通食品储备)</option>
+                                            <option value="小康家境" selected>小康家境 (资金充裕，常用药品工具)</option>
+                                            <option value="富裕家境">富裕家境 (资金丰富，初始拥有高级物资)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-zinc-200">6. 主角天赋</td>
+                                    <td class="p-2.5">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs">
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="健谈" checked class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">🗣️ 健谈</span>: 易获信任，体力偏弱</div>
+                                            </label>
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="内向" class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">🔍 内向</span>: 易发现线索，主动社交难</div>
+                                            </label>
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="强壮" class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">💪 强壮</span>: 体力负重高，搜寻观察弱</div>
+                                            </label>
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="灵敏" class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">⚡ 灵敏</span>: 移动避险快，体力消耗大</div>
+                                            </label>
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="聪明" class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">🧠 聪明</span>: 解锁线索快，心态易焦虑</div>
+                                            </label>
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="人缘好" class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">🤝 人缘好</span>: NPC初始好感高，易消耗资源</div>
+                                            </label>
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="运气" class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">🍀 运气</span>: 易获得良性稀有物，恢复慢</div>
+                                            </label>
+                                            <label class="p-2 border border-apocalypse-700 rounded bg-apocalypse-950 hover:border-amber-500 cursor-pointer flex items-start gap-1.5">
+                                                <input type="radio" name="talent" value="动手能力" class="mt-0.5 accent-amber-500">
+                                                <div><span class="font-bold text-amber-400">🔧 动手能力</span>: 制作加固成功率极高</div>
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <button onclick="promptStartConfirm()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-sm sm:text-base shadow-lg">
+                        提交人设并开启游戏 <i class="fa-solid fa-check ml-1"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 2: Confirmation Modal -->
+            <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                <div class="bg-apocalypse-900 border border-amber-500/50 rounded-xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4 fade-in">
+                    <i class="fa-solid fa-circle-question text-amber-500 text-4xl"></i>
+                    <h3 class="text-lg font-bold text-zinc-100">确认人设创建</h3>
+                    <p class="text-xs text-zinc-400">是否正式开启末日生存游戏？（开启后将锁定人设数据）</p>
+                    <div class="flex gap-3 pt-2">
+                        <button onclick="closeConfirmModal()" class="flex-1 py-2 bg-apocalypse-800 hover:bg-apocalypse-700 text-zinc-300 rounded-lg text-xs">重新修改</button>
+                        <button onclick="startDisclaimerAndBackground()" class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">正式开启</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Disclaimer & World Background -->
+            <section id="sec-disclaimer-bg" class="hidden space-y-4 fade-in">
+                <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-5 shadow-xl space-y-4">
+                    <div class="border-b border-apocalypse-700 pb-2">
+                        <h2 class="text-base font-bold text-rose-500 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved"></i> 免责声明与末日背景规范
+                        </h2>
+                    </div>
+                    
+                    <div class="bg-apocalypse-950 p-3 rounded-lg border border-apocalypse-800 text-xs text-zinc-400 space-y-1.5 leading-relaxed">
+                        <p class="text-amber-500 font-semibold">[免责声明]</p>
+                        <p>本游戏为架空虚构文字生存互动，所有剧情、人物、失序事件、虚拟代币与道具仅存在虚拟游戏内；请勿模仿；代币不可兑换现实财物；无血腥惊悚与疫病设定。</p>
+                    </div>
+
+                    <div class="bg-apocalypse-950 p-3.5 rounded-lg border border-apocalypse-700 text-xs sm:text-sm text-zinc-300 space-y-2 leading-relaxed">
+                        <h3 class="text-amber-400 font-bold flex items-center gap-1.5"><i class="fa-solid fa-earth-americas"></i> 世界背景</h3>
+                        <p>现代架空都市，和平生活毫无预兆崩塌，未知失序事件席卷整座城市。官方通讯中断，失序者无规律游荡在城市角落。不存在传染机制，袭击仅会造成外伤。</p>
+                        <p>食物、水源、安全住所全面紧缺。末日倒计时锁定三十天，未知的危机等待你的抉择。</p>
+                    </div>
+
+                    <button onclick="startOpeningStory()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-sm">
+                        理解规则，载入开局剧情 <i class="fa-solid fa-play ml-1"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 4: Opening Plot & Faction Selection -->
+            <section id="sec-opening-story" class="hidden space-y-4 fade-in">
+                <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-5 shadow-xl space-y-4">
+                    <div class="border-b border-apocalypse-700 pb-2 flex justify-between items-center">
+                        <h2 id="story-chapter-title" class="text-base font-bold text-amber-500">【序章：风暴前的诡异平静】</h2>
+                        <span class="text-xs text-zinc-500 font-mono">Day 1 - 08:00</span>
+                    </div>
+                    
+                    <div id="opening-plot-text" class="text-xs sm:text-sm text-zinc-300 leading-relaxed space-y-2.5 bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800">
+                        <!-- Dynamic plot injected here -->
+                    </div>
+
+                    <div id="faction-selection-box" class="hidden space-y-3 pt-2">
+                        <h3 class="text-xs sm:text-sm font-bold text-amber-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-users-rays"></i> 请确定自身生存派系（永久影响行动偏好）：
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <button onclick="selectFaction('保守型')" class="p-2.5 bg-apocalypse-950 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left transition space-y-1">
+                                <div class="font-bold text-amber-400">🏰 保守型</div>
+                                <div class="text-zinc-400 text-xs">重囤积加固与庇护所防护，低风险，NPC信任稳定。</div>
+                            </button>
+                            <button onclick="selectFaction('搜寻小队型')" class="p-2.5 bg-apocalypse-950 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left transition space-y-1">
+                                <div class="font-bold text-amber-400">🎒 搜寻小队型</div>
+                                <div class="text-zinc-400 text-xs">擅长外出生存搜寻，高物资收益，队伍交集频繁。</div>
+                            </button>
+                            <button onclick="selectFaction('独行型')" class="p-2.5 bg-apocalypse-950 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left transition space-y-1">
+                                <div class="font-bold text-amber-400">🐺 独行型</div>
+                                <div class="text-zinc-400 text-xs">注重个人隐蔽与单兵反应，不受羁绊拖累。</div>
+                            </button>
+                            <button onclick="selectFaction('综合型')" class="p-2.5 bg-apocalypse-950 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left transition space-y-1">
+                                <div class="font-bold text-amber-400">⚖️ 综合型</div>
+                                <div class="text-zinc-400 text-xs">平衡各项策略，声望中立，随机应变力强。</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 5: Day/Dusk/Night Period Greeting Banner Overlay -->
+            <section id="sec-period-greeting" class="hidden my-auto space-y-4 text-center fade-in">
+                <div class="bg-apocalypse-900 border border-amber-500/40 rounded-xl p-6 max-w-md mx-auto shadow-2xl space-y-4">
+                    <div id="period-emoji" class="text-4xl">🌅</div>
+                    <p id="period-greeting-text" class="text-sm sm:text-base font-mono italic text-amber-300">
+                        <!-- Dynamic period quote injected here -->
+                    </p>
+                    <button onclick="continueFromPeriodGreeting()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-xs sm:text-sm">
+                        【继续游戏】推进剧情
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 6: Main Narrative Log & Interaction Hall -->
+            <section id="sec-main-game" class="hidden space-y-3 fade-in">
+                
+                <!-- Chapter Title Bar -->
+                <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-4 shadow-xl space-y-3">
+                    <div class="flex justify-between items-center border-b border-apocalypse-700 pb-2">
+                        <h2 id="main-chapter-title" class="text-sm sm:text-base font-bold text-amber-500">【第一章：初露端倪】</h2>
+                        <span id="main-chapter-time" class="text-xs text-zinc-400 font-mono">Day 1 · 10:00</span>
+                    </div>
+
+                    <!-- Story Stream Log Box -->
+                    <div id="main-story-text" class="text-xs sm:text-sm text-zinc-200 leading-relaxed space-y-2.5 bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800 min-h-[140px] max-h-[380px] overflow-y-auto">
+                        <!-- Main plot text generated dynamically -->
+                    </div>
+
+                    <!-- Four Dynamic Options (ABCD) -->
+                    <div id="main-options-box" class="grid grid-cols-1 gap-2 pt-1">
+                        <!-- ABCD buttons dynamically generated -->
+                    </div>
+                </div>
+
+                <!-- Quick Query Toolbar (All 16 Panels + Rewind Button) -->
+                <div class="bg-apocalypse-900 border border-apocalypse-700/80 rounded-xl p-3 shadow-lg space-y-2">
+                    <div class="text-xs text-zinc-400 flex justify-between items-center">
+                        <span class="font-bold text-amber-400"><i class="fa-solid fa-sliders mr-1"></i>全功能查询面板</span>
+                        <span class="text-zinc-500 text-[10px]">实时更新动态数据</span>
+                    </div>
+                    <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-[11px]">
+                        <button onclick="openPanel('profile')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-id-card text-amber-400"></i> 面板</button>
+                        <button onclick="openPanel('backpack')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-box text-emerald-400"></i> 背包</button>
+                        <button onclick="openPanel('warehouse')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-warehouse text-sky-400"></i> 仓库</button>
+                        <button onclick="openPanel('quests')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-list-check text-yellow-400"></i> 任务</button>
+                        <button onclick="openPanel('stats')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-heart-pulse text-rose-400"></i> 状态</button>
+                        <button onclick="openPanel('npcs')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-users text-indigo-400"></i> NPC</button>
+                        <button onclick="openPanel('shop')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-store text-amber-500"></i> 商城</button>
+                        <button onclick="openPanel('map')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-map-location-dot text-emerald-500"></i> 地图</button>
+                        <button onclick="openPanel('shelter')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-house-shield text-teal-400"></i> 庇护所</button>
+                        <button onclick="openPanel('forecast')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-sun text-yellow-300"></i> 天气</button>
+                        <button onclick="openPanel('achievements')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-medal text-amber-300"></i> 成就</button>
+                        <button onclick="openPanel('codex')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-book-atlas text-purple-400"></i> 图鉴</button>
+                        <button onclick="openPanel('level')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-chart-line text-cyan-400"></i> 等级</button>
+                        <button onclick="openPanel('currencies')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-coins text-yellow-400"></i> 货币</button>
+                        <button onclick="openPanel('factions')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-shield text-blue-400"></i> 派系</button>
+                        <button onclick="openPanel('clues')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-magnifying-glass text-amber-400"></i> 线索</button>
+                    </div>
+                    <div class="pt-1 flex justify-between items-center text-xs">
+                        <button onclick="rewindGame()" class="px-3 py-1 bg-apocalypse-800 hover:bg-apocalypse-700 border border-amber-500/50 rounded text-amber-400 font-bold transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i>节点回溯 (1000金币)
+                        </button>
+                        <button onclick="openPanel('all')" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded">
+                            查看全面板
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 7: Game Ending View -->
+            <section id="sec-ending" class="hidden space-y-4 fade-in">
+                <div class="bg-apocalypse-900 border border-amber-500/60 rounded-xl p-5 shadow-2xl space-y-5">
+                    <div class="text-center space-y-1.5">
+                        <div id="ending-icon" class="text-4xl text-amber-500"><i class="fa-solid fa-trophy"></i></div>
+                        <h2 id="ending-title" class="text-xl font-bold text-amber-400">末日三十天：终章结算</h2>
+                        <p class="text-xs text-zinc-400">全局游戏总结与成就称号授予</p>
+                    </div>
+
+                    <!-- Granted Title Box -->
+                    <div class="bg-apocalypse-950 border border-amber-500/40 p-3.5 rounded-lg text-center space-y-1">
+                        <span class="text-[11px] text-zinc-500 uppercase tracking-wider">获得专属结局称号</span>
+                        <div id="ending-badge" class="text-lg font-bold text-amber-400 text-glow">【幸存王】</div>
+                        <p id="ending-badge-desc" class="text-xs text-zinc-400 italic">"在严酷的末日危机中展现了完美的生存智慧。"</p>
+                    </div>
+
+                    <!-- ~500 word Immersive Narrative Summary -->
+                    <div class="bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800 space-y-2 text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                        <h3 class="font-bold text-amber-400 border-b border-apocalypse-700 pb-1.5"><i class="fa-solid fa-scroll mr-1"></i> 生存轨迹终章总结</h3>
+                        <p id="ending-summary-text" class="indent-6 space-y-2">
+                            <!-- Dynamic ~500 word narrative injected here -->
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2 pt-1">
+                        <button onclick="rewindGame()" class="flex-1 py-2.5 bg-apocalypse-800 hover:bg-apocalypse-700 text-amber-400 font-bold border border-apocalypse-600 rounded-lg text-xs">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> 回溯重玩 (需1000金币)
+                        </button>
+                        <button onclick="startNewGame()" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">
+                            <i class="fa-solid fa-user-plus mr-1"></i> 新角色重开 (继承成就)
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ================= RIGHT COLUMN: REAL-TIME STATUS & ENVIRONMENT PANEL ================= -->
+        <aside id="sidebar-right" class="lg:col-span-3 hidden flex-col bg-apocalypse-900 border border-apocalypse-700/80 rounded-xl p-3 shadow-xl space-y-3 max-h-[88vh] sticky top-14 overflow-y-auto">
+            
+            <!-- Real-time Time & Weather Box -->
+            <div class="bg-apocalypse-950 p-3 rounded-lg border border-apocalypse-800 space-y-2">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-amber-400 font-bold"><i class="fa-solid fa-hourglass-half mr-1"></i>倒计时: <span id="rt-day" class="text-sm text-zinc-100 font-mono">30</span> 天</span>
+                    <span id="rt-time" class="text-xs font-mono bg-apocalypse-800 px-2 py-0.5 rounded text-amber-300">08:00</span>
+                </div>
+                <div class="flex justify-between items-center text-xs text-zinc-400">
+                    <span><i class="fa-solid fa-cloud-sun mr-1"></i><span id="rt-season">深秋</span>·<span id="rt-weather">阴天</span></span>
+                    <span><i class="fa-solid fa-temperature-half mr-1"></i><span id="rt-temp">14</span>℃</span>
+                </div>
+            </div>
+
+            <!-- Infrared Mutant Detection Device Bar -->
+            <div id="rt-infrared-box" class="hidden bg-apocalypse-950 border border-sky-500/40 p-2.5 rounded-lg text-xs space-y-1">
+                <div class="flex justify-between items-center font-bold text-sky-400">
+                    <span><i class="fa-solid fa-eye text-rose-400 animate-pulse mr-1"></i>360°红外检测仪</span>
+                    <span id="rt-infrared-batt" class="text-zinc-400 text-[11px]">电量 100%</span>
+                </div>
+                <div id="rt-infrared-status" class="text-zinc-300 text-[11px]">未侦测到异变者活动</div>
+            </div>
+
+            <!-- Dynamic Core Body Progress Stats -->
+            <div class="space-y-2 text-xs">
+                <div class="font-bold text-zinc-400 border-b border-apocalypse-800 pb-1 flex justify-between">
+                    <span>生命体征与状态</span>
+                    <span id="rt-injury-tag" class="text-emerald-400 font-normal">无伤势</span>
+                </div>
+                
+                <!-- Satiety -->
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-zinc-300"><i class="fa-solid fa-utensils text-amber-500 mr-1"></i>饱食度</span>
+                        <span id="txt-satiety" class="font-mono text-amber-400">85/100</span>
+                    </div>
+                    <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
+                        <div id="bar-satiety" class="bg-amber-500 h-full rounded-full transition-all" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <!-- Thirst -->
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-zinc-300"><i class="fa-solid fa-droplet text-sky-400 mr-1"></i>水分值</span>
+                        <span id="txt-thirst" class="font-mono text-sky-400">85/100</span>
+                    </div>
+                    <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
+                        <div id="bar-thirst" class="bg-sky-500 h-full rounded-full transition-all" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <!-- Stamina -->
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-zinc-300"><i class="fa-solid fa-bolt text-emerald-400 mr-1"></i>体力值</span>
+                        <span id="txt-stamina" class="font-mono text-emerald-400">100/100</span>
+                    </div>
+                    <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
+                        <div id="bar-stamina" class="bg-emerald-500 h-full rounded-full transition-all" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- Mood -->
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-zinc-300"><i class="fa-solid fa-face-smile text-yellow-400 mr-1"></i>心情值</span>
+                        <span id="txt-mood" class="font-mono text-yellow-400">80/100</span>
+                    </div>
+                    <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
+                        <div id="bar-mood" class="bg-yellow-400 h-full rounded-full transition-all" style="width: 80%;"></div>
+                    </div>
+                </div>
+
+                <!-- Sanity -->
+                <div>
+                    <div class="flex justify-between text-[11px] mb-0.5">
+                        <span class="text-zinc-300"><i class="fa-solid fa-brain text-purple-400 mr-1"></i>精神值</span>
+                        <span id="txt-sanity" class="font-mono text-purple-400">90/100</span>
+                    </div>
+                    <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
+                        <div id="bar-sanity" class="bg-purple-500 h-full rounded-full transition-all" style="width: 90%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual Assets & Currencies Box -->
+            <div class="bg-apocalypse-950 p-2.5 rounded-lg border border-apocalypse-800 space-y-1.5 text-xs">
+                <div class="font-bold text-zinc-400 border-b border-apocalypse-800 pb-1">虚拟代币资产</div>
+                <div class="grid grid-cols-3 gap-1 text-center font-mono">
+                    <div class="bg-apocalypse-900 p-1 rounded"><span class="text-[10px] text-zinc-500">钻石</span><br><span id="rt-diamond" class="text-sky-400 font-bold">10</span></div>
+                    <div class="bg-apocalypse-900 p-1 rounded"><span class="text-[10px] text-zinc-500">金币</span><br><span id="rt-gold" class="text-amber-400 font-bold">1200</span></div>
+                    <div class="bg-apocalypse-900 p-1 rounded"><span class="text-[10px] text-zinc-500">银币</span><br><span id="rt-silver" class="text-zinc-300 font-bold">300</span></div>
+                </div>
+            </div>
+
+            <!-- Faction Reputation Summary -->
+            <div class="bg-apocalypse-950 p-2.5 rounded-lg border border-apocalypse-800 text-xs space-y-1">
+                <div class="font-bold text-zinc-400 border-b border-apocalypse-800 pb-1">派系声望</div>
+                <div id="rt-faction-desc" class="text-amber-400 font-semibold text-[11px]">保守型 (基础声望 10)</div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- UNIVERSAL QUERY PANELS MODAL WINDOW -->
+    <div id="universal-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden fade-in">
+            <div class="px-5 py-3 border-b border-apocalypse-700 bg-apocalypse-950 flex justify-between items-center">
+                <h3 id="modal-title" class="text-sm sm:text-base font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> 功能面板
+                </h3>
+                <button onclick="closeModal()" class="text-zinc-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="modal-body" class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3 text-xs sm:text-sm text-zinc-300">
+                <!-- Content Filled Dynamically -->
+            </div>
+            <div class="px-4 py-2 border-t border-apocalypse-800 bg-apocalypse-950 text-[11px] text-zinc-500 text-center">
+                输入对应关键词或点击按钮可随时调取功能面板 · 数据实时更新
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME ENGINE JAVASCRIPT CODE -->
+    <script>
+        /* ================= GAME STATE OBJECT ================= */
+        let gameState = {
+            player: {
+                name: '陈默',
+                gender: '男',
+                age: '23-30岁',
+                living: '伴侣同住',
+                wealth: '小康家境',
+                talent: '健谈',
+                faction: '未确定',
+                level: 1,
+                xp: 0,
+                maxXp: 100,
+                // Core Body Stats
+                satiety: 85,    // 饱食度
+                thirst: 85,     // 水分值
+                stamina: 100,   // 体力值
+                injury: 0,      // 伤势状态 (0-100)
+                sanity: 90,     // 精神值
+                mood: 80       // 心情值
+            },
+            time: {
+                day: 1,
+                hour: 8,
+                minute: 0,
+                season: '深秋',
+                weather: '阴天',
+                temp: 14,
+                period: '白天' // 白天, 黄昏, 深夜
+            },
+            currencies: {
+                diamond: 10,
+                gold: 1200,
+                silver: 300
+            },
+            infrared: {
+                acquired: false,
+                active: false,
+                battery: 100,
+                mutantsAround: false
+            },
+            shelter: {
+                built: false,
+                name: '临时住宅庇护点',
+                durability: 80,
+                stealth: 60,
+                capacity: 100,
+                safety: 50,
+                aboveFloors: 1,
+                underFloors: 0
+            },
+            inventory: [
+                { id: 'water', name: '纯净水', cat: 'food', qty: 3, quality: '完好', effect: '水分 +30, 消耗15分钟', expireDays: 30 },
+                { id: 'biscuit', name: '压缩饼干', cat: 'food', qty: 4, quality: '完好', effect: '饱食度 +25, 消耗15分钟', expireDays: 25 },
+                { id: 'bandage', name: '医用纱布', cat: 'medical', qty: 2, quality: '完好', effect: '减轻伤势 -20', expireDays: 90 },
+                { id: 'screw', name: '螺丝零件', cat: 'tool', qty: 8, quality: '轻微损耗', effect: '用于庇护所建造加固', expireDays: 999 }
+            ],
+            inventoryFilter: 'all',
+            warehouse: [
+                { id: 'gear', name: '机械齿轮', qty: 5, cat: 'tool', desc: '用于加固或制作设备' }
+            ],
+            npcs: {
+                'lin': { name: '林小晚', relation: '警惕', score: 20, bio: '隔壁面包店幸存者，细腻敏感。', req: '需要饮用水与药物' },
+                'zhang': { name: '老张', relation: '陌生', score: 0, bio: '五金店老板，懂建材加固。', req: '需要螺丝零件' },
+                'su': { name: '苏芮', relation: '信任', score: 45, bio: '同住伴侣/亲密伙伴，相互依靠。', req: '无' }
+            },
+            factions: {
+                conservative: 10,
+                scavenger: 10,
+                lone: 10,
+                comprehensive: 10
+            },
+            quests: [
+                { id: 'q1', title: '加固门窗隐蔽', status: '进行中', reward: '经验+50, 金币+200', desc: '提高住所隐蔽值，防止随机闯入' }
+            ],
+            clues: [
+                '官方通知：失序者对强烈光照与刺耳噪音非常敏感。',
+                '字条：3号楼地下室好像储存了大量的干净桶装水。'
+            ],
+            achievements: [
+                { title: '初入末世', unlocked: true, desc: '开启末日三十天第一天' }
+            ],
+            codex: {
+                items: ['纯净水', '压缩饼干', '医用纱布', '螺丝零件'],
+                npcs: ['林小晚', '老张', '苏芮'],
+                locations: ['社区住户区', '隔壁便利店', '地下车库']
+            },
+            rewindNodes: [],
+            currentStep: 'intro'
+        };
+
+        /* ================= GAME INITIALIZATION ================= */
+        window.onload = function() {
+            // Typing stutter effect for intro
+            const text = "好……你好……欢迎进入《末日三十天》生存模拟系统……~";
+            let idx = 0;
+            const elem = document.getElementById('stutter-text');
+            elem.innerHTML = "";
+            const interval = setInterval(() => {
+                elem.innerHTML += text[idx];
+                idx++;
+                if (idx >= text.length) clearInterval(interval);
+            }, 50);
+
+            renderLeftInventory();
+            updateRightStatusPanel();
+        };
+
+        function toggleMobileSidebar(side) {
+            const left = document.getElementById('sidebar-left');
+            const right = document.getElementById('sidebar-right');
+            if (side === 'left') {
+                left.classList.toggle('hidden');
+                right.classList.add('hidden');
+            } else {
+                right.classList.toggle('hidden');
+                left.classList.add('hidden');
+            }
+        }
+
+        /* ================= FLOW CONTROLLER ================= */
+        function goToCharCreation() {
+            document.getElementById('sec-intro').classList.add('hidden');
+            document.getElementById('sec-char-create').classList.remove('hidden');
+            gameState.currentStep = 'char_create';
+        }
+
+        function promptStartConfirm() {
+            gameState.player.name = document.getElementById('input-name').value.trim() || '陈默';
+            gameState.player.gender = document.querySelector('input[name="gender"]:checked').value;
+            gameState.player.age = document.getElementById('select-age').value;
+            gameState.player.living = document.getElementById('select-living').value;
+            gameState.player.wealth = document.getElementById('select-wealth').value;
+            gameState.player.talent = document.querySelector('input[name="talent"]:checked').value;
+
+            if (gameState.player.wealth === '富裕家境') {
+                gameState.currencies.gold = 2500;
+                gameState.currencies.diamond = 30;
+            } else if (gameState.player.wealth === '普通家境') {
+                gameState.currencies.gold = 600;
+            }
+
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        function startDisclaimerAndBackground() {
+            closeConfirmModal();
+            document.getElementById('sec-char-create').classList.add('hidden');
+            document.getElementById('sec-disclaimer-bg').classList.remove('hidden');
+        }
+
+        function startOpeningStory() {
+            document.getElementById('sec-disclaimer-bg').classList.add('hidden');
+            document.getElementById('sec-opening-story').classList.remove('hidden');
+            
+            const plotElem = document.getElementById('opening-plot-text');
+            let plotHtml = "";
+
+            if (gameState.player.living === '独居') {
+                plotHtml = `
+                    <p class="text-amber-400 font-semibold">[独居专属剧情 - 电视异常弹窗]</p>
+                    <p>清晨 08:00，室内死一般沉寂。你正准备接一杯凉开水，原本播放雪花台的旧电视突然发出剧烈滋滋异响！</p>
+                    <p>屏幕上猛地弹出一行殷红的字体：<span class="text-rose-400 font-mono font-bold">“全市紧急戒严，通讯信号倒计时中断，请市民锁紧门窗，切勿靠近窗户……”</span></p>
+                    <p>紧接着电视彻底黑屏。楼道里传来一阵沉闷迟缓的拖沓脚步声，伴随着房门把手被轻轻拧动的冰冷声音……</p>
+                `;
+            } else {
+                plotHtml = `
+                    <p class="text-amber-400 font-semibold">[同住专属剧情 - 恐惧式台词提醒]</p>
+                    <p>“陈默……你听到了吗？刚才窗外撞击门锁的声音……绝不是猫撞倒垃圾桶！”</p>
+                    <p>同住的<sup>${gameState.player.living}</sup>脸色煞白地死死抓着你的手臂，手指冰凉颤抖。拉开窗帘一丝缝隙，声音抽泣：</p>
+                    <p>“街角那个人……姿势非常不自然……刚才直挺挺摔倒，又慢慢爬起来了……手机没有信号了，我们怎么办？”</p>
+                `;
+            }
+            plotElem.innerHTML = plotHtml;
+            document.getElementById('faction-selection-box').classList.remove('hidden');
+        }
+
+        function selectFaction(factionName) {
+            gameState.player.faction = factionName;
+            saveRewindNode("开启末日：确定派系");
+
+            document.getElementById('sec-opening-story').classList.add('hidden');
+            
+            // 正式进入游戏：大屏幕下显示左右侧边栏
+            document.getElementById('sidebar-left').classList.add('lg:flex');
+            document.getElementById('sidebar-right').classList.add('lg:flex');
+
+            // 移动端：显示顶部背包与状态切换按钮
+            const mobileToggles = document.getElementById('mobile-sidebar-toggles');
+            if (mobileToggles) {
+                mobileToggles.classList.remove('hidden');
+                mobileToggles.classList.add('flex', 'lg:hidden');
+            }
+
+            updateRightStatusPanel();
+            renderStoryNode(1, "第一章：初露端倪", "09:30", 
+                `你正式确立了<b>【${factionName}】</b>的求生路线。此时远方传来警报器撕裂声，随即彻底归于沉寂。<br><br>你检查了房间内的储蓄，饱食度与水分尚可，但长远来看，食物与门窗加固是当务之急。隔壁传来隐约的敲击声，似乎幸存者也在暗中窥探。`,
+                [
+                    { text: "🔒 [保守] 立即清点物资，将重型衣柜推到门口加固防线", action: () => advanceStory(30, -5, -5, 0, "你花费半小时将衣柜封死房门，庇护所防线大幅增强。"), style: "conservative" },
+                    { text: "🎒 [搜寻] 趁着清晨光线好，带上背包溜去隔壁便利店搜寻", action: () => advanceStory(60, -15, -15, -10, "你小心翼翼摸到便利店，搜寻到了2瓶纯净水与压缩饼干。"), style: "scavenge" },
+                    { text: "🤝 [善良] 主动敲击墙壁，尝试与隔壁幸存邻居建立安全沟通", action: () => advanceStory(15, -2, -2, +5, "隔壁传来回应，邻居林小晚对你表达了初步善意。"), style: "kind" },
+                    { text: "🐺 [自私] 紧闭门窗拉上窗帘，保存体力冷眼观望外界异变", action: () => advanceStory(45, -1, -1, 0, "你静坐室内观察外界，确认失序者行动较为缓慢。"), style: "selfish" }
+                ]
+            );
+        }
+
+        /* ================= LEFT INVENTORY & DIRECT USE SYSTEM ================= */
+        function filterInventory(category) {
+            gameState.inventoryFilter = category;
+            ['all', 'food', 'medical', 'tool'].forEach(c => {
+                const btn = document.getElementById(`inv-tab-${c}`);
+                if (btn) {
+                    if (c === category) {
+                        btn.className = "flex-1 py-1 rounded bg-amber-600 text-zinc-950 font-bold text-center";
+                    } else {
+                        btn.className = "flex-1 py-1 rounded bg-apocalypse-800 text-zinc-400 hover:text-zinc-200 text-center";
+                    }
+                }
+            });
+            renderLeftInventory();
+        }
+
+        function renderLeftInventory() {
+            const listElem = document.getElementById('left-inventory-list');
+            if (!listElem) return;
+
+            let filtered = gameState.inventory;
+            if (gameState.inventoryFilter !== 'all') {
+                filtered = gameState.inventory.filter(i => i.cat === gameState.inventoryFilter);
+            }
+
+            if (filtered.length === 0) {
+                listElem.innerHTML = `<div class="text-zinc-500 italic text-center py-4">无此分类物资</div>`;
+                return;
+            }
+
+            let html = "";
+            filtered.forEach(item => {
+                const isUsable = item.cat === 'food' || item.cat === 'medical';
+                html += `
+                    <div class="p-2 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center gap-1.5">
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-zinc-200 flex items-center justify-between">
+                                <span class="truncate">${item.name}</span>
+                                <span class="text-amber-400 font-mono ml-1">x${item.qty}</span>
+                            </div>
+                            <div class="text-[10px] text-zinc-400 truncate">${item.effect || '基础配件'}</div>
+                            <div class="text-[9px] text-zinc-500">品质: <span class="text-emerald-400">${item.quality}</span></div>
+                        </div>
+                        ${isUsable ? `
+                            <button onclick="useItemDirectly('${item.id}')" class="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded text-[11px] whitespace-nowrap shadow">
+                                使用
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            listElem.innerHTML = html;
+
+            // Update Capacity Progress
+            const totalQty = gameState.inventory.reduce((a, b) => a + b.qty, 0);
+            document.getElementById('inv-capacity-tag').innerText = `容量: ${totalQty}/20`;
+            document.getElementById('inv-capacity-bar').style.width = `${Math.min(100, (totalQty / 20) * 100)}%`;
+        }
+
+        function useItemDirectly(itemId) {
+            const item = gameState.inventory.find(i => i.id === itemId);
+            if (!item || item.qty <= 0) return;
+
+            item.qty--;
+            if (item.qty <= 0) {
+                gameState.inventory = gameState.inventory.filter(i => i.id !== itemId);
+            }
+
+            let logMsg = "";
+            if (itemId === 'water') {
+                adjustStats(0, +30, 0, +5);
+                advanceTime(15);
+                logMsg = `<b>[补充水分]</b> 饮用了1瓶纯净水，水分值增加30点，耗时15分钟。`;
+            } else if (itemId === 'biscuit') {
+                adjustStats(+25, 0, 0, +5);
+                advanceTime(15);
+                logMsg = `<b>[进食进餐]</b> 吃下了1块压缩饼干，饱食度增加25点，耗时15分钟。`;
+            } else if (itemId === 'bandage') {
+                gameState.player.injury = Math.max(0, gameState.player.injury - 20);
+                adjustStats(0, 0, 0, +10);
+                advanceTime(10);
+                logMsg = `<b>[包扎伤口]</b> 使用医用纱布认真处理了伤口，伤势减轻20点。`;
+            }
+
+            // Append Log into center story box
+            const storyBox = document.getElementById('main-story-text');
+            if (storyBox) {
+                storyBox.innerHTML += `<div class="p-2 bg-emerald-950/60 border-l-2 border-emerald-500 text-emerald-300 text-xs mt-2 fade-in">${logMsg}</div>`;
+                storyBox.scrollTop = storyBox.scrollHeight;
+            }
+
+            renderLeftInventory();
+            updateRightStatusPanel();
+        }
+
+        /* ================= RIGHT REAL-TIME STATUS PANEL SYSTEM ================= */
+        function updateRightStatusPanel() {
+            document.getElementById('rt-day').innerText = (31 - gameState.time.day);
+            document.getElementById('rt-time').innerText = `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`;
+            document.getElementById('rt-season').innerText = gameState.time.season;
+            document.getElementById('rt-weather').innerText = gameState.time.weather;
+            document.getElementById('rt-temp').innerText = gameState.time.temp;
+
+            // Infrared Box
+            if (gameState.infrared.acquired) {
+                document.getElementById('rt-infrared-box').classList.remove('hidden');
+                document.getElementById('rt-infrared-batt').innerText = `电量 ${gameState.infrared.battery}%`;
+                document.getElementById('rt-infrared-status').innerText = gameState.infrared.mutantsAround ? '🚨 侦测到周围游荡异变者！' : '周边暂未侦测到威胁';
+            }
+
+            // Stats update
+            document.getElementById('txt-satiety').innerText = `${gameState.player.satiety}/100`;
+            document.getElementById('bar-satiety').style.width = `${gameState.player.satiety}%`;
+
+            document.getElementById('txt-thirst').innerText = `${gameState.player.thirst}/100`;
+            document.getElementById('bar-thirst').style.width = `${gameState.player.thirst}%`;
+
+            document.getElementById('txt-stamina').innerText = `${gameState.player.stamina}/100`;
+            document.getElementById('bar-stamina').style.width = `${gameState.player.stamina}%`;
+
+            document.getElementById('txt-mood').innerText = `${gameState.player.mood}/100`;
+            document.getElementById('bar-mood').style.width = `${gameState.player.mood}%`;
+
+            document.getElementById('txt-sanity').innerText = `${gameState.player.sanity}/100`;
+            document.getElementById('bar-sanity').style.width = `${gameState.player.sanity}%`;
+
+            document.getElementById('rt-injury-tag').innerText = gameState.player.injury > 0 ? `伤势 ${gameState.player.injury}%` : '无伤势';
+
+            // Currencies & Factions
+            document.getElementById('rt-diamond').innerText = gameState.currencies.diamond;
+            document.getElementById('rt-gold').innerText = gameState.currencies.gold;
+            document.getElementById('rt-silver').innerText = gameState.currencies.silver;
+            document.getElementById('rt-faction-desc').innerText = `${gameState.player.faction} (声望 ${gameState.factions.conservative})`;
+        }
+
+        /* ================= TIME & STATS ENGINE ================= */
+        function adjustStats(satietyDelta, thirstDelta, staminaDelta, moodDelta = 0) {
+            gameState.player.satiety = Math.min(100, Math.max(0, gameState.player.satiety + satietyDelta));
+            gameState.player.thirst = Math.min(100, Math.max(0, gameState.player.thirst + thirstDelta));
+            gameState.player.stamina = Math.min(100, Math.max(0, gameState.player.stamina + staminaDelta));
+            gameState.player.mood = Math.min(100, Math.max(0, gameState.player.mood + moodDelta));
+
+            updateRightStatusPanel();
+
+            if (gameState.player.satiety <= 20 || gameState.player.thirst <= 20 || gameState.player.stamina <= 15) {
+                triggerRedWarning("警告：饱食度或水分严重低于安全阈值！请立刻补充水分食粮！");
+            }
+            if (gameState.player.satiety <= 0 || gameState.player.thirst <= 0) {
+                triggerDefeatEnding("因极度饥渴与衰竭失去求生能力。");
+            }
+        }
+
+        function advanceTime(minutes) {
+            let oldPeriod = gameState.time.period;
+            gameState.time.minute += minutes;
+            while (gameState.time.minute >= 60) {
+                gameState.time.minute -= 60;
+                gameState.time.hour += 1;
+            }
+            while (gameState.time.hour >= 24) {
+                gameState.time.hour -= 24;
+                gameState.time.day += 1;
+            }
+
+            let h = gameState.time.hour;
+            if (h >= 6 && h < 18) gameState.time.period = '白天';
+            else if (h >= 18 && h < 21) gameState.time.period = '黄昏';
+            else gameState.time.period = '深夜';
+
+            if (gameState.time.day > 30) {
+                triggerVictoryEnding();
+                return false;
+            }
+
+            updateRightStatusPanel();
+
+            if (oldPeriod !== gameState.time.period) {
+                showPeriodGreetingOverlay(gameState.time.period);
+                return false;
+            }
+            return true;
+        }
+
+        function showPeriodGreetingOverlay(period) {
+            document.getElementById('sec-main-game').classList.add('hidden');
+            const secGreeting = document.getElementById('sec-period-greeting');
+            const txt = document.getElementById('period-greeting-text');
+            const emoji = document.getElementById('period-emoji');
+
+            if (period === '白天') {
+                emoji.innerHTML = "🌅";
+                txt.innerHTML = "<i>“早上好 美好的一天又开始咯（轻松绷住）”</i>";
+            } else if (period === '黄昏') {
+                emoji.innerHTML = "🌇";
+                txt.innerHTML = "<i>“黄昏降临，天光渐暗，未知的危险正在悄悄蛰伏~”</i>";
+            } else {
+                emoji.innerHTML = "🌙";
+                txt.innerHTML = "<i>“天黑了”</i>";
+            }
+
+            secGreeting.classList.remove('hidden');
+        }
+
+        function continueFromPeriodGreeting() {
+            document.getElementById('sec-period-greeting').classList.add('hidden');
+            document.getElementById('sec-main-game').classList.remove('hidden');
+        }
+
+        function triggerRedWarning(msg) {
+            document.getElementById('red-warning-msg').innerText = msg;
+            document.getElementById('red-warning-modal').classList.remove('hidden');
+        }
+
+        function closeRedWarning() {
+            document.getElementById('red-warning-modal').classList.add('hidden');
+        }
+
+        /* ================= STORY LOG ENGINE ================= */
+        function renderStoryNode(day, chapterTitle, timeStr, storyHtml, choices) {
+            document.getElementById('sec-main-game').classList.remove('hidden');
+            document.getElementById('main-chapter-title').innerHTML = `【${chapterTitle}】`;
+            document.getElementById('main-chapter-time').innerText = `Day ${gameState.time.day} · ${timeStr}`;
+            document.getElementById('main-story-text').innerHTML = storyHtml;
+
+            const optBox = document.getElementById('main-options-box');
+            optBox.innerHTML = "";
+
+            const prefixEmojis = ['🅰️', '🅱️', '🅰️', '🎲'];
+            choices.forEach((c, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "p-2.5 sm:p-3 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left transition flex items-start gap-2 text-xs sm:text-sm text-zinc-200 shadow";
+                btn.innerHTML = `<span class="text-sm">${prefixEmojis[idx]}</span> <span class="flex-1">${c.text}</span>`;
+                btn.onclick = () => c.action();
+                optBox.appendChild(btn);
+            });
+        }
+
+        function advanceStory(minutesCost, satDelta, thirstDelta, staminaDelta, resultText) {
+            adjustStats(satDelta, thirstDelta, staminaDelta);
+            const timeOk = advanceTime(minutesCost);
+            if (!timeOk) return;
+
+            const nextDay = gameState.time.day;
+            const hourStr = `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`;
+
+            let title = `第${nextDay}天：生存考验`;
+            let plot = `${resultText}<br><br>时间来到 ${hourStr}。窗外大雾弥漫，楼道传来金属刮擦声。你需要做出新的抉择：`;
+            
+            let choices = [
+                {
+                    text: "🧱 [保守] 固守房门，检查物资，清理仓储",
+                    action: () => advanceStory(30, -3, -3, +10, "你清点了物资，庇护所隐蔽与安全度稳定。")
+                },
+                {
+                    text: "🔍 [搜寻] 循着声音去废弃垃圾桶与废墟翻找螺丝齿轮",
+                    action: () => {
+                        addItemToInventory('screw', '螺丝零件', 'tool', 2, '用于庇护所建造');
+                        advanceStory(90, -10, -15, -15, "你在废弃电路箱旁翻捡到了2个螺丝零件！");
+                    }
+                },
+                {
+                    text: "🆘 [善良] 遇到弱小幸存者求助，出面分予微量压缩饼干",
+                    action: () => {
+                        gameState.npcs['lin'].score += 15;
+                        gameState.npcs['lin'].relation = '信任';
+                        advanceStory(40, -5, -5, -5, "你将少许食粮分给邻居林小晚，对方感激涕零！");
+                    }
+                },
+                {
+                    text: "🚪 [自私] 锁紧门锁熄灭光源，优先保全自身不向外应声",
+                    action: () => advanceStory(20, -1, -1, 0, "你熄灭光源，成功避开了外来的骚扰。")
+                }
+            ];
+
+            if (nextDay === 5) {
+                title = "第五天：红外检测仪与物资交换";
+                plot = `在旧物品箱里，你拼装出<b>360°红外检测仪</b>！已可以在右侧面板查看实时异变者动向。`;
+                gameState.infrared.acquired = true;
+            } else if (nextDay >= 30) {
+                triggerVictoryEnding();
+                return;
+            }
+
+            renderStoryNode(nextDay, title, hourStr, plot, choices);
+        }
+
+        function addItemToInventory(id, name, cat, qty, effect) {
+            let item = gameState.inventory.find(i => i.id === id);
+            if (item) item.qty += qty;
+            else gameState.inventory.push({ id, name, cat, qty, quality: '完好', effect, expireDays: 60 });
+            renderLeftInventory();
+        }
+
+        /* ================= 16 PANELS MODAL SYSTEM ================= */
+        function openPanel(panelKey) {
+            const modal = document.getElementById('universal-modal');
+            const titleElem = document.getElementById('modal-title');
+            const bodyElem = document.getElementById('modal-body');
+
+            modal.classList.remove('hidden');
+            bodyElem.innerHTML = "";
+
+            switch (panelKey) {
+                case 'profile':
+                    titleElem.innerHTML = `<i class="fa-solid fa-id-card text-amber-400"></i> 角色基础属性`;
+                    bodyElem.innerHTML = `
+                        <div class="grid grid-cols-2 gap-2.5 bg-apocalypse-950 p-3 rounded-lg border border-apocalypse-800">
+                            <div><b>姓名:</b> ${gameState.player.name}</div>
+                            <div><b>性别:</b> ${gameState.player.gender}</div>
+                            <div><b>年龄:</b> ${gameState.player.age}</div>
+                            <div><b>陪伴关系:</b> ${gameState.player.living}</div>
+                            <div><b>家庭条件:</b> ${gameState.player.wealth}</div>
+                            <div><b>主角天赋:</b> <span class="text-amber-400">${gameState.player.talent}</span></div>
+                            <div><b>生存派系:</b> <span class="text-emerald-400">${gameState.player.faction}</span></div>
+                            <div><b>等级:</b> Lv.${gameState.player.level} (${gameState.player.xp}/${gameState.player.maxXp} XP)</div>
+                        </div>
+                    `;
+                    break;
+
+                case 'backpack':
+                    titleElem.innerHTML = `<i class="fa-solid fa-box text-emerald-400"></i> 背包全量物资`;
+                    let invHtml = `<div class="space-y-2">`;
+                    gameState.inventory.forEach(item => {
+                        invHtml += `
+                            <div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold text-zinc-200">${item.name} <span class="text-xs text-amber-400">x${item.qty}</span></div>
+                                    <div class="text-xs text-zinc-400">${item.effect}</div>
+                                </div>
+                                <span class="text-xs text-emerald-400 font-bold">${item.quality}</span>
+                            </div>
+                        `;
+                    });
+                    invHtml += `</div>`;
+                    bodyElem.innerHTML = invHtml;
+                    break;
+
+                case 'warehouse':
+                    titleElem.innerHTML = `<i class="fa-solid fa-warehouse text-sky-400"></i> 庇护所仓库`;
+                    let whHtml = `<div class="grid grid-cols-2 gap-2">`;
+                    gameState.warehouse.forEach(w => {
+                        whHtml += `<div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded">
+                            <div class="font-bold text-zinc-200">${w.name}</div>
+                            <div class="text-xs text-zinc-400">数量: ${w.qty}</div>
+                        </div>`;
+                    });
+                    whHtml += `</div>`;
+                    bodyElem.innerHTML = whHtml;
+                    break;
+
+                case 'quests':
+                    titleElem.innerHTML = `<i class="fa-solid fa-list-check text-yellow-400"></i> 生存任务`;
+                    let qHtml = `<div class="space-y-2">`;
+                    gameState.quests.forEach(q => {
+                        qHtml += `<div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded">
+                            <div class="flex justify-between font-bold text-amber-400">
+                                <span>${q.title}</span>
+                                <span class="text-xs text-emerald-400">[${q.status}]</span>
+                            </div>
+                            <div class="text-xs text-zinc-300 mt-1">${q.desc}</div>
+                        </div>`;
+                    });
+                    qHtml += `</div>`;
+                    bodyElem.innerHTML = qHtml;
+                    break;
+
+                case 'npcs':
+                    titleElem.innerHTML = `<i class="fa-solid fa-users text-indigo-400"></i> NPC交互与关系好感`;
+                    let npcHtml = `<div class="space-y-2.5">`;
+                    Object.values(gameState.npcs).forEach(npc => {
+                        npcHtml += `<div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded space-y-1">
+                            <div class="flex justify-between font-bold text-zinc-200">
+                                <span>${npc.name}</span>
+                                <span class="text-amber-400 text-xs">好感等级: ${npc.relation} (${npc.score}pts)</span>
+                            </div>
+                            <div class="text-xs text-zinc-400">${npc.bio}</div>
+                            <div class="text-xs text-rose-400">当前需求: ${npc.req}</div>
+                        </div>`;
+                    });
+                    npcHtml += `</div>`;
+                    bodyElem.innerHTML = npcHtml;
+                    break;
+
+                case 'shop':
+                    titleElem.innerHTML = `<i class="fa-solid fa-store text-amber-500"></i> 商城物资交易`;
+                    bodyElem.innerHTML = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center">
+                                <div><div class="font-bold text-zinc-200">加固防线木板</div><div class="text-xs text-zinc-400">提高庇护所耐久</div></div>
+                                <button onclick="buyShopItem('plate', 300)" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded text-xs">300 金币</button>
+                            </div>
+                            <div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center">
+                                <div><div class="font-bold text-zinc-200">军用急救箱</div><div class="text-xs text-zinc-400">快速治愈伤势</div></div>
+                                <button onclick="buyShopItem('medkit', 500)" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded text-xs">500 金币</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'shelter':
+                    titleElem.innerHTML = `<i class="fa-solid fa-house-shield text-teal-400"></i> 庇护所建筑与地下扩建`;
+                    bodyElem.innerHTML = `
+                        <div class="space-y-3 bg-apocalypse-950 p-3.5 rounded-lg border border-apocalypse-800">
+                            <div class="font-bold text-amber-400">${gameState.shelter.name}</div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div>耐久度: ${gameState.shelter.durability}/100</div>
+                                <div>隐蔽值: ${gameState.shelter.stealth}/100</div>
+                                <div>地上结构: ${gameState.shelter.aboveFloors} 层 (最高3层)</div>
+                                <div>地下扩建: ${gameState.shelter.underFloors} 层 (无限横向)</div>
+                            </div>
+                            <button onclick="upgradeShelter()" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded text-xs">升级加固庇护所 (消耗 400 金币)</button>
+                        </div>
+                    `;
+                    break;
+
+                default:
+                    bodyElem.innerHTML = `<div class="text-center py-6 text-zinc-400">面板数据已实时同步并在界面中直接展示！</div>`;
+                    break;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('universal-modal').classList.add('hidden');
+        }
+
+        function buyShopItem(itemKey, cost) {
+            if (gameState.currencies.gold >= cost) {
+                gameState.currencies.gold -= cost;
+                if (itemKey === 'plate') gameState.shelter.durability = Math.min(100, gameState.shelter.durability + 25);
+                alert("购买成功！物资已放入应用。");
+                openPanel('shop');
+                updateRightStatusPanel();
+            } else {
+                alert("金币不足！无法兑换。");
+            }
+        }
+
+        function upgradeShelter() {
+            if (gameState.currencies.gold >= 400) {
+                gameState.currencies.gold -= 400;
+                gameState.shelter.underFloors += 1;
+                alert("地下区域扩建成功！储物容量增加。");
+                openPanel('shelter');
+                updateRightStatusPanel();
+            } else {
+                alert("金币不足 400！");
+            }
+        }
+
+        /* ================= NODE REWIND SYSTEM ================= */
+        function saveRewindNode(desc) {
+            if (gameState.rewindNodes.length >= 3) gameState.rewindNodes.shift();
+            gameState.rewindNodes.push({
+                desc,
+                stateCopy: JSON.parse(JSON.stringify(gameState))
+            });
+        }
+
+        function rewindGame() {
+            if (gameState.currencies.gold < 1000) {
+                alert("回溯失败：节点回溯需要消耗 1000 金币，当前金币不足！");
+                return;
+            }
+            if (gameState.rewindNodes.length === 0) {
+                alert("暂无可回溯的关键节点！");
+                return;
+            }
+
+            gameState.currencies.gold -= 1000;
+            const node = gameState.rewindNodes.pop();
+            const costGold = gameState.currencies.gold;
+
+            gameState = node.stateCopy;
+            gameState.currencies.gold = costGold;
+
+            document.getElementById('sec-ending').classList.add('hidden');
+            document.getElementById('sec-main-game').classList.remove('hidden');
+            renderLeftInventory();
+            updateRightStatusPanel();
+            alert(`成功消耗1000金币，已回溯至节点：【${node.desc}】！`);
+        }
+
+        /* ================= ENDING GENERATOR ================= */
+        function triggerVictoryEnding() {
+            document.getElementById('sec-main-game').classList.add('hidden');
+            document.getElementById('sec-ending').classList.remove('hidden');
+
+            let title = "【幸存王】";
+            let titleDesc = "在三十天末日危机中全胜归来，各项指标保持极佳。";
+
+            if (gameState.currencies.gold >= 2500) {
+                title = "【百万富翁】";
+                titleDesc = "最终积累了令人瞩目的财富与硬通货，物资富足。";
+            } else if (gameState.inventory.length >= 5) {
+                title = "【购物狂】";
+                titleDesc = "搜罗囤积了大量物资，背包充盈。";
+            } else if (gameState.player.faction === '独行型') {
+                title = "【孤狼】";
+                titleDesc = "全程独行，以一己之力战胜三十天恶劣环境。";
+            }
+
+            document.getElementById('ending-badge').innerText = title;
+            document.getElementById('ending-badge-desc').innerText = `"${titleDesc}"`;
+
+            const summaryText = `
+                当第三十天的第一缕晨光破开连绵不绝的阴霾雾气，照亮这座疮痍满目的都市时，耳畔那持续了整整一个月的死寂终于被远方清晰的救援鸣笛声打破。
+                回顾这艰难的三十天，从第1天电视突然中断信号、同住伙伴的恐慌抽泣，到你果断选择以<b>【${gameState.player.faction}】</b>的姿态立足求生，每一步都步步惊心。
+                在此期间，你凭借<b>【${gameState.player.talent}】</b>的专属优势，在物资匮乏、寒潮袭击与异变者悄然蔓延的重重阴影下，艰难筹谋。你精心搭建加固了属于自己的庇护所，并巧妙运用360°红外检测仪洞察周围未知的危险。
+                在人性博弈的十字路口，你与邻居林小晚等幸存者建立了来之不易的信任。你未曾主动伤害他人，而是在保全自我的底线上展现了理智与温情。
+                如今，30天倒计时彻底归零，城市终于迎来了阶段性转机。你不仅活了下来，更书写了一段真实自然、无憾于心的末日生存传奇。
+            `;
+            document.getElementById('ending-summary-text').innerHTML = summaryText;
+        }
+
+        function triggerDefeatEnding(reasonText) {
+            document.getElementById('sec-main-game').classList.add('hidden');
+            document.getElementById('sec-ending').classList.remove('hidden');
+
+            document.getElementById('ending-icon').innerHTML = `<i class="fa-solid fa-skull text-rose-500"></i>`;
+            document.getElementById('ending-title').innerText = "末日三十天：生存中断";
+            document.getElementById('ending-badge').innerText = "【负重前行】";
+            document.getElementById('ending-badge-desc').innerText = '"尽力抵御到了最后一刻，终因环境压迫而止步。"';
+
+            document.getElementById('ending-summary-text').innerHTML = `
+                末日的残忍超出了所有人的预料。在第 ${gameState.time.day} 天，主角${reasonText}
+                未知的风暴依然在城市上方虐，但属于你的求生故事在此画上了句点。你可以选择消耗金币进行节点回溯，或者以全新角色重新挑战《末日三十天》。
+            `;
+        }
+
+        function startNewGame() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
