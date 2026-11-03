@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
+<html lang="zh-TW" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>末日三十天 - 五級盔甲+地獄開局+黑市盲盒+環境災害版</title>
+    <title id="doc-title">末日三十天 - 五級盔甲+地獄開局+黑市盲盒+環境災害版</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -57,26 +57,36 @@
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-2">
                 <span class="text-amber-500 font-bold text-base sm:text-lg flex items-center gap-2">
-                    <i class="fa-solid fa-biohazard text-amber-500 animate-pulse"></i> 末日三十天
+                    <i class="fa-solid fa-biohazard text-amber-500 animate-pulse"></i> <span id="hdr-game-title">末日三十天</span>
                 </span>
-                <span class="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 hidden sm:inline">5級盔甲+地獄開局+黑市盲盒</span>
+                <span id="hdr-game-subtitle" class="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 hidden sm:inline">5級盔甲+地獄開局+黑市盲盒</span>
             </div>
-            
-            <!-- Quick RPG Level & Stage Bar -->
+
+            <!-- Quick RPG Level & Stage Bar + Language Switcher -->
             <div class="flex items-center gap-3 text-xs">
+                <!-- Language Selector -->
+                <div class="flex items-center gap-1 bg-apocalypse-950 px-2 py-1 rounded border border-amber-500/40">
+                    <i class="fa-solid fa-globe text-amber-400"></i>
+                    <select id="lang-select" onchange="switchLanguage(this.value)" class="bg-transparent text-amber-300 font-bold focus:outline-none text-xs cursor-pointer">
+                        <option value="zh-TW" class="bg-apocalypse-900 text-zinc-200">繁體中文</option>
+                        <option value="zh-CN" class="bg-apocalypse-900 text-zinc-200">简体中文</option>
+                        <option value="en" class="bg-apocalypse-900 text-zinc-200">English</option>
+                    </select>
+                </div>
+
                 <div class="flex items-center gap-2 bg-apocalypse-950 px-2.5 py-1 rounded border border-apocalypse-800">
-                    <span class="text-rose-400 font-bold"><i class="fa-solid fa-dungeon mr-1"></i>關卡: <span id="hdr-stage">1</span></span>
-                    <span class="text-amber-400 font-bold ml-2">Lv.<span id="hdr-level">1</span></span>
+                    <span class="text-rose-400 font-bold"><i class="fa-solid fa-dungeon mr-1"></i><span id="lbl-hdr-stage">關卡</span>: <span id="hdr-stage">1</span></span>
+                    <span class="text-amber-400 font-bold ml-2"><span id="lbl-hdr-level">Lv.</span><span id="hdr-level">1</span></span>
                     <div class="w-12 sm:w-16 bg-apocalypse-800 h-1.5 rounded-full overflow-hidden hidden sm:block">
                         <div id="hdr-xp-bar" class="bg-amber-500 h-full" style="width: 0%;"></div>
                     </div>
                 </div>
                 <div id="mobile-sidebar-toggles" class="hidden items-center gap-2 text-xs">
                     <button onclick="toggleMobileSidebar('left')" class="px-2.5 py-1 bg-apocalypse-800 border border-apocalypse-600 rounded text-amber-400 font-semibold">
-                        <i class="fa-solid fa-box-open mr-1"></i>背包
+                        <i class="fa-solid fa-box-open mr-1"></i><span id="lbl-mob-inv">背包</span>
                     </button>
                     <button onclick="toggleMobileSidebar('right')" class="px-2.5 py-1 bg-apocalypse-800 border border-apocalypse-600 rounded text-emerald-400 font-semibold">
-                        <i class="fa-solid fa-chart-simple mr-1"></i>狀態
+                        <i class="fa-solid fa-chart-simple mr-1"></i><span id="lbl-mob-stats">狀態</span>
                     </button>
                 </div>
             </div>
@@ -87,10 +97,10 @@
     <div id="red-warning-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-apocalypse-900 border-2 border-rose-600 rounded-xl max-w-md w-full p-6 shadow-2xl text-center space-y-4 fade-in alert-pulse">
             <div class="text-rose-500 text-5xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h3 class="text-xl font-bold text-rose-500 tracking-wide text-glow-red">生存警告：身體狀態跌破安全閾值！</h3>
+            <h3 id="lbl-red-warning-title" class="text-xl font-bold text-rose-500 tracking-wide text-glow-red">生存警告：身體狀態跌破安全閾值！</h3>
             <p id="red-warning-msg" class="text-sm text-zinc-300 leading-relaxed">您的生命體徵跌破安全線！請立刻使用背包補水、進食或睡覺休整！</p>
             <button onclick="closeRedWarning()" class="w-full py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-lg transition shadow-lg">
-                <i class="fa-solid fa-kit-medical mr-2"></i>開始救治休整
+                <i class="fa-solid fa-kit-medical mr-2"></i><span id="lbl-btn-rescue">開始救治休整</span>
             </button>
         </div>
     </div>
@@ -102,7 +112,7 @@
         <aside id="sidebar-left" class="lg:col-span-3 hidden flex-col bg-apocalypse-900 border border-apocalypse-700/80 rounded-xl p-3 shadow-xl space-y-3 max-h-[88vh] sticky top-14 overflow-hidden">
             <div class="flex justify-between items-center border-b border-apocalypse-700 pb-2">
                 <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-boxes-packing text-amber-500"></i> 背包與物資直用
+                    <i class="fa-solid fa-boxes-packing text-amber-500"></i> <span id="lbl-left-inv-title">背包與物資直用</span>
                 </h3>
                 <span id="inv-capacity-tag" class="text-xs text-zinc-400 font-mono">容量: 0/25</span>
             </div>
@@ -121,7 +131,7 @@
                     <div id="inv-capacity-bar" class="bg-amber-500 h-full rounded-full transition-all" style="width: 20%;"></div>
                 </div>
                 <button onclick="openPanel('workbench')" class="w-full py-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/60 rounded text-xs text-amber-400 font-bold transition flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-screws-wrench"></i> 打開工作台合成防護裝備
+                    <i class="fa-solid fa-screws-wrench"></i> <span id="lbl-left-wb-btn">打開工作台合成防護裝備</span>
                 </button>
             </div>
         </aside>
@@ -133,7 +143,7 @@
             <section id="sec-intro" class="space-y-4 fade-in">
                 <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-5 shadow-xl space-y-4">
                     <div class="border-b border-apocalypse-700 pb-3">
-                        <h1 class="text-xl sm:text-2xl font-bold text-amber-500 flex items-center gap-2">
+                        <h1 id="intro-title" class="text-xl sm:text-2xl font-bold text-amber-500 flex items-center gap-2">
                             <i class="fa-solid fa-biohazard"></i>《末日三十天》極限防護升級版
                         </h1>
                     </div>
@@ -141,24 +151,24 @@
                         <span id="stutter-text" class="text-amber-400 font-semibold">好……你好……歡迎進入《末日三十天》極限生存系統……~</span>
                     </div>
                     <div class="space-y-2">
-                        <h2 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">最新升級內容：</h2>
+                        <h2 id="lbl-intro-upgrade-hdr" class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">最新升級內容：</h2>
                         <ul class="space-y-2 text-xs sm:text-sm text-zinc-300">
                             <li class="bg-apocalypse-950 p-2.5 rounded border border-apocalypse-800 flex items-start gap-2">
-                                <span class="text-sky-400 font-bold">🛡️ [五級防禦盔甲]</span>
-                                <span>破舊布衣 ➜ 熟皮硬甲 ➜ 重型鐵甲 ➜ 戰術合金甲 ➜ 終極動力外骨骼！</span>
+                                <span id="lbl-upg1-title" class="text-sky-400 font-bold">🛡️ [五級防禦盔甲]</span>
+                                <span id="lbl-upg1-desc">破舊布衣 ➜ 熟皮硬甲 ➜ 重型鐵甲 ➜ 戰術合金甲 ➜ 終極動力外骨骼！</span>
                             </li>
                             <li class="bg-apocalypse-950 p-2.5 rounded border border-apocalypse-800 flex items-start gap-2">
-                                <span class="text-rose-500 font-bold">📦 [地獄級極少開局]</span>
-                                <span>開局僅有極少量基本物資，金幣僅 150，考驗你的精細算計與搜刮規劃！</span>
+                                <span id="lbl-upg2-title" class="text-rose-500 font-bold">📦 [地獄級極少開局]</span>
+                                <span id="lbl-upg2-desc">開局僅有極少量基本物資，金幣僅 150，考驗你的精細算計與搜刮規劃！</span>
                             </li>
                             <li class="bg-apocalypse-950 p-2.5 rounded border border-apocalypse-800 flex items-start gap-2">
-                                <span class="text-amber-500 font-bold">🎰 [黑市盲盒 & 災害]</span>
-                                <span>流浪商人盲盒賭物資，隨機輻射酸雨與極寒暴風考驗你的盔甲防護等級！</span>
+                                <span id="lbl-upg3-title" class="text-amber-500 font-bold">🎰 [黑市盲盒 & 災害]</span>
+                                <span id="lbl-upg3-desc">流浪商人盲盒賭物資，隨機輻射酸雨與極寒暴風考驗你的盔甲防護等級！</span>
                             </li>
                         </ul>
                     </div>
                     <button onclick="goToCharCreation()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-sm sm:text-base shadow-lg">
-                        開始創建生存角色 <i class="fa-solid fa-arrow-right ml-1"></i>
+                        <span id="lbl-btn-start-create">開始創建生存角色</span> <i class="fa-solid fa-arrow-right ml-1"></i>
                     </button>
                 </div>
             </section>
@@ -166,7 +176,7 @@
             <!-- STEP 1: Character Creation -->
             <section id="sec-char-create" class="hidden space-y-4 fade-in">
                 <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
-                    <h2 class="text-lg font-bold text-amber-500 flex items-center gap-2 border-b border-apocalypse-700 pb-2">
+                    <h2 id="lbl-char-header" class="text-lg font-bold text-amber-500 flex items-center gap-2 border-b border-apocalypse-700 pb-2">
                         <i class="fa-solid fa-user-gear"></i> 基礎人設與初始屬性
                     </h2>
                     
@@ -174,44 +184,44 @@
                         <table class="w-full text-left text-xs sm:text-sm text-zinc-300 border-collapse">
                             <thead>
                                 <tr class="bg-apocalypse-950 text-amber-400 border-b border-apocalypse-700">
-                                    <th class="p-2.5 w-24">項目</th>
-                                    <th class="p-2.5">自訂選擇</th>
+                                    <th id="lbl-col-item" class="p-2.5 w-24">項目</th>
+                                    <th id="lbl-col-choice" class="p-2.5">自訂選擇</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-apocalypse-800">
                                 <tr>
-                                    <td class="p-2.5 font-semibold text-zinc-200">1. 姓名</td>
+                                    <td id="lbl-field-name" class="p-2.5 font-semibold text-zinc-200">1. 姓名</td>
                                     <td class="p-2.5">
                                         <input type="text" id="input-name" value="陳默" class="bg-apocalypse-950 border border-apocalypse-600 rounded px-3 py-1.5 w-full max-w-xs focus:outline-none focus:border-amber-500 text-amber-300">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2.5 font-semibold text-zinc-200">2. 性別</td>
+                                    <td id="lbl-field-gender" class="p-2.5 font-semibold text-zinc-200">2. 性別</td>
                                     <td class="p-2.5">
                                         <div class="flex gap-4">
-                                            <label class="cursor-pointer flex items-center gap-1"><input type="radio" name="gender" value="男" checked class="accent-amber-500"> 男 (物理攻擊+2)</label>
-                                            <label class="cursor-pointer flex items-center gap-1"><input type="radio" name="gender" value="女" class="accent-amber-500"> 女 (閃避率+5%)</label>
+                                            <label class="cursor-pointer flex items-center gap-1"><input type="radio" name="gender" value="男" checked class="accent-amber-500"><span id="lbl-gender-male">男 (物理攻擊+2)</span></label>
+                                            <label class="cursor-pointer flex items-center gap-1"><input type="radio" name="gender" value="女" class="accent-amber-500"><span id="lbl-gender-female">女 (閃避率+5%)</span></label>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2.5 font-semibold text-zinc-200">3. 年齡</td>
+                                    <td id="lbl-field-age" class="p-2.5 font-semibold text-zinc-200">3. 年齡</td>
                                     <td class="p-2.5">
                                         <select id="select-age" class="bg-apocalypse-950 border border-apocalypse-600 rounded px-2.5 py-1.5 text-zinc-200 text-xs sm:text-sm">
-                                            <option value="18-22歲">18-22歲 (初始體力+20)</option>
-                                            <option value="23-30歲" selected>23-30歲 (各項屬性均衡)</option>
-                                            <option value="30歲以上">30歲以上 (初始防禦+2)</option>
+                                            <option value="18-22歲" id="lbl-age-1">18-22歲 (初始體力+20)</option>
+                                            <option value="23-30歲" id="lbl-age-2" selected>23-30歲 (各項屬性均衡)</option>
+                                            <option value="30歲以上" id="lbl-age-3">30歲以上 (初始防禦+2)</option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2.5 font-semibold text-zinc-200">4. 主角天賦</td>
+                                    <td id="lbl-field-talent" class="p-2.5 font-semibold text-zinc-200">4. 主角天賦</td>
                                     <td class="p-2.5">
                                         <select id="select-talent" class="bg-apocalypse-950 border border-apocalypse-600 rounded px-2.5 py-1.5 text-zinc-200 text-xs sm:text-sm">
-                                            <option value="強壯">💪 強壯 (力量+3, 基礎攻擊大幅提升)</option>
-                                            <option value="靈敏">⚡ 靈敏 (敏捷+3, 閃避率提高)</option>
-                                            <option value="堅韌">🛡️ 堅韌 (體質+3, 防禦與最大體力提高)</option>
-                                            <option value="動手能力" selected>🔧 動手能力 (合成折扣 & 暴擊+10%)</option>
+                                            <option value="強壯" id="lbl-talent-1">💪 強壯 (力量+3, 基礎攻擊大幅提升)</option>
+                                            <option value="靈敏" id="lbl-talent-2">⚡ 靈敏 (敏捷+3, 閃避率提高)</option>
+                                            <option value="堅韌" id="lbl-talent-3">🛡️ 堅韌 (體質+3, 防禦與最大體力提高)</option>
+                                            <option value="動手能力" id="lbl-talent-4" selected>🔧 動手能力 (合成折扣 & 暴擊+10%)</option>
                                         </select>
                                     </td>
                                 </tr>
@@ -220,7 +230,7 @@
                     </div>
 
                     <button onclick="promptStartConfirm()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-sm sm:text-base shadow-lg">
-                        提交人設並開啟遊戲 <i class="fa-solid fa-check ml-1"></i>
+                        <span id="lbl-btn-submit-char">提交人設並開啟遊戲</span> <i class="fa-solid fa-check ml-1"></i>
                     </button>
                 </div>
             </section>
@@ -229,10 +239,10 @@
             <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                 <div class="bg-apocalypse-900 border border-amber-500/50 rounded-xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4 fade-in">
                     <i class="fa-solid fa-circle-question text-amber-500 text-4xl"></i>
-                    <h3 class="text-lg font-bold text-zinc-100">確認開啟末日生存？</h3>
+                    <h3 id="lbl-confirm-title" class="text-lg font-bold text-zinc-100">確認開啟末日生存？</h3>
                     <div class="flex gap-3 pt-2">
-                        <button onclick="closeConfirmModal()" class="flex-1 py-2 bg-apocalypse-800 hover:bg-apocalypse-700 text-zinc-300 rounded-lg text-xs">重新修改</button>
-                        <button onclick="startDisclaimerAndBackground()" class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">正式開啟</button>
+                        <button onclick="closeConfirmModal()" id="lbl-btn-modify" class="flex-1 py-2 bg-apocalypse-800 hover:bg-apocalypse-700 text-zinc-300 rounded-lg text-xs">重新修改</button>
+                        <button onclick="startDisclaimerAndBackground()" id="lbl-btn-confirm-start" class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">正式開啟</button>
                     </div>
                 </div>
             </div>
@@ -240,14 +250,14 @@
             <!-- Disclaimer & Background -->
             <section id="sec-disclaimer-bg" class="hidden space-y-4 fade-in">
                 <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-5 shadow-xl space-y-4">
-                    <h2 class="text-base font-bold text-rose-500 flex items-center gap-2">
+                    <h2 id="lbl-disclaimer-title" class="text-base font-bold text-rose-500 flex items-center gap-2">
                         <i class="fa-solid fa-shield-halved"></i> 免責聲明與末日背景
                     </h2>
-                    <p class="text-xs text-zinc-300 leading-relaxed bg-apocalypse-950 p-3 rounded-lg border border-apocalypse-800">
+                    <p id="lbl-disclaimer-text" class="text-xs text-zinc-300 leading-relaxed bg-apocalypse-950 p-3 rounded-lg border border-apocalypse-800">
                         架空末日都市背景。極限物資開局，打造防禦盔甲，對抗極端天氣與闖關怪物，存活滿30天！
                     </p>
                     <button onclick="startOpeningStory()" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-sm">
-                        載入開局劇情 <i class="fa-solid fa-play ml-1"></i>
+                        <span id="lbl-btn-load-plot">載入開局劇情</span> <i class="fa-solid fa-play ml-1"></i>
                     </button>
                 </div>
             </section>
@@ -255,20 +265,20 @@
             <!-- Opening Story -->
             <section id="sec-opening-story" class="hidden space-y-4 fade-in">
                 <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl p-5 shadow-xl space-y-4">
-                    <h2 class="text-base font-bold text-amber-500">【序章：風暴前夕】 Day 1 - 08:00</h2>
+                    <h2 id="lbl-opening-title" class="text-base font-bold text-amber-500">【序章：風暴前夕】 Day 1 - 08:00</h2>
                     <div id="opening-plot-text" class="text-xs sm:text-sm text-zinc-300 leading-relaxed bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800">
                         警報聲撕裂天空，廣播中傳來斷斷續續的警告：“請所有市民立刻封閉門窗……通訊即將中斷……”
                     </div>
                     <div id="faction-selection-box" class="space-y-3 pt-2">
-                        <h3 class="text-xs sm:text-sm font-bold text-amber-400">請選擇生存派系：</h3>
+                        <h3 id="lbl-faction-hdr" class="text-xs sm:text-sm font-bold text-amber-400">請選擇生存派系：</h3>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <button onclick="selectFaction('保守型')" class="p-2.5 bg-apocalypse-950 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left">
-                                <div class="font-bold text-amber-400">🏰 保守型</div>
-                                <div class="text-zinc-400 text-[10px]">重囤積防禦，初始防禦+2。</div>
+                                <div id="lbl-faction-cons" class="font-bold text-amber-400">🏰 保守型</div>
+                                <div id="lbl-faction-cons-desc" class="text-zinc-400 text-[10px]">重囤積防禦，初始防禦+2。</div>
                             </button>
                             <button onclick="selectFaction('搜尋型')" class="p-2.5 bg-apocalypse-950 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left">
-                                <div class="font-bold text-amber-400">🎒 搜尋型</div>
-                                <div class="text-zinc-400 text-[10px]">擅長戰鬥搜尋，初始攻擊+3。</div>
+                                <div id="lbl-faction-scav" class="font-bold text-amber-400">🎒 搜尋型</div>
+                                <div id="lbl-faction-scav-desc" class="text-zinc-400 text-[10px]">擅長戰鬥搜尋，初始攻擊+3。</div>
                             </button>
                         </div>
                     </div>
@@ -281,7 +291,7 @@
                     <div id="period-emoji" class="text-4xl">🌅</div>
                     <p id="period-greeting-text" class="text-sm sm:text-base font-mono italic text-amber-300"></p>
                     <button onclick="continueFromPeriodGreeting()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg transition text-xs sm:text-sm">
-                        【繼續遊戲】推進劇情
+                        <span id="lbl-greeting-btn">【繼續遊戲】推進劇情</span>
                     </button>
                 </div>
             </section>
@@ -298,7 +308,7 @@
                     <!-- Armor Status Bar -->
                     <div class="bg-apocalypse-950 px-3 py-1.5 rounded border border-sky-500/30 flex justify-between items-center text-xs">
                         <span class="text-sky-400 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved"></i> 當前防禦裝備：
+                            <i class="fa-solid fa-shield-halved"></i> <span id="lbl-equipped-armor-hdr">當前防禦裝備：</span>
                         </span>
                         <span id="equipped-armor-tag" class="text-zinc-300 font-mono">無防具 (防禦+0)</span>
                     </div>
@@ -314,43 +324,43 @@
                 <!-- ALL 16 PANELS TOOLBAR -->
                 <div class="bg-apocalypse-900 border border-apocalypse-700/80 rounded-xl p-3 shadow-lg space-y-2">
                     <div class="text-xs text-zinc-400 flex justify-between items-center">
-                        <span class="font-bold text-amber-400"><i class="fa-solid fa-sliders mr-1"></i>全功能查詢面板 (16大模組)</span>
-                        <span class="text-zinc-500 text-[10px]">資料即時同步</span>
+                        <span class="font-bold text-amber-400"><i class="fa-solid fa-sliders mr-1"></i><span id="lbl-panel-title-query">全功能查詢面板 (16大模組)</span></span>
+                        <span id="lbl-data-sync" class="text-zinc-500 text-[10px]">資料即時同步</span>
                     </div>
                     <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-[11px]">
-                        <button onclick="openPanel('profile')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-id-card text-amber-400"></i> 面板</button>
-                        <button onclick="openPanel('backpack')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-box text-emerald-400"></i> 背包</button>
+                        <button onclick="openPanel('profile')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-id-card text-amber-400"></i> <span id="pbtn-profile">面板</span></button>
+                        <button onclick="openPanel('backpack')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-box text-emerald-400"></i> <span id="pbtn-backpack">背包</span></button>
                         
                         <button onclick="openPanel('quests')" class="relative p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center">
-                            <i class="fa-solid fa-list-check text-yellow-400"></i> 任務
+                            <i class="fa-solid fa-list-check text-yellow-400"></i> <span id="pbtn-quests">任務</span>
                             <span id="quest-red-dot" class="hidden absolute -top-1 -right-1 flex h-3 w-3">
                                 <span class="red-dot-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
                             </span>
                         </button>
 
-                        <button onclick="openPanel('workbench')" class="p-1.5 bg-apocalypse-950 hover:bg-amber-600/20 border border-amber-500 rounded text-center font-bold text-amber-400"><i class="fa-solid fa-screws-wrench text-amber-400"></i> 工作台</button>
-                        <button onclick="openPanel('stats')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-heart-pulse text-rose-400"></i> 狀態</button>
-                        <button onclick="openPanel('npcs')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-users text-indigo-400"></i> NPC</button>
-                        <button onclick="openPanel('shop')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-store text-amber-400"></i> 商城</button>
-                        <button onclick="openPanel('map')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-map-location-dot text-emerald-500"></i> 地圖</button>
-                        <button onclick="openPanel('shelter')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-house-shield text-teal-400"></i> 庇護所</button>
-                        <button onclick="openPanel('forecast')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-sun text-yellow-300"></i> 天氣</button>
-                        <button onclick="openPanel('achievements')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-medal text-amber-300"></i> 成就</button>
-                        <button onclick="openPanel('codex')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-book-atlas text-purple-400"></i> 圖鑑</button>
-                        <button onclick="openPanel('level')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-chart-line text-cyan-400"></i> 等級</button>
-                        <button onclick="openPanel('currencies')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-coins text-yellow-400"></i> 貨幣</button>
-                        <button onclick="openPanel('factions')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-shield text-blue-400"></i> 派系</button>
-                        <button onclick="openPanel('clues')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-magnifying-glass text-amber-400"></i> 線索</button>
+                        <button onclick="openPanel('workbench')" class="p-1.5 bg-apocalypse-950 hover:bg-amber-600/20 border border-amber-500 rounded text-center font-bold text-amber-400"><i class="fa-solid fa-screws-wrench text-amber-400"></i> <span id="pbtn-workbench">工作台</span></button>
+                        <button onclick="openPanel('stats')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-heart-pulse text-rose-400"></i> <span id="pbtn-stats">狀態</span></button>
+                        <button onclick="openPanel('npcs')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-users text-indigo-400"></i> <span id="pbtn-npcs">NPC</span></button>
+                        <button onclick="openPanel('shop')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-store text-amber-400"></i> <span id="pbtn-shop">商城</span></button>
+                        <button onclick="openPanel('map')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-map-location-dot text-emerald-500"></i> <span id="pbtn-map">地圖</span></button>
+                        <button onclick="openPanel('shelter')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-house-shield text-teal-400"></i> <span id="pbtn-shelter">庇護所</span></button>
+                        <button onclick="openPanel('forecast')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-sun text-yellow-300"></i> <span id="pbtn-forecast">天氣</span></button>
+                        <button onclick="openPanel('achievements')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-medal text-amber-300"></i> <span id="pbtn-achievements">成就</span></button>
+                        <button onclick="openPanel('codex')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-book-atlas text-purple-400"></i> <span id="pbtn-codex">圖鑑</span></button>
+                        <button onclick="openPanel('level')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-chart-line text-cyan-400"></i> <span id="pbtn-level">等級</span></button>
+                        <button onclick="openPanel('currencies')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-coins text-yellow-400"></i> <span id="pbtn-currencies">貨幣</span></button>
+                        <button onclick="openPanel('factions')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-shield text-blue-400"></i> <span id="pbtn-factions">派系</span></button>
+                        <button onclick="openPanel('clues')" class="p-1.5 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 rounded text-center"><i class="fa-solid fa-magnifying-glass text-amber-400"></i> <span id="pbtn-clues">線索</span></button>
                     </div>
                     <div class="pt-1 flex flex-wrap justify-between items-center gap-1.5 text-xs">
-                        <button onclick="buyGambleBox()" class="px-3 py-1 bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-zinc-950 font-bold rounded shadow">
+                        <button onclick="buyGambleBox()" id="lbl-btn-gamble" class="px-3 py-1 bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-zinc-950 font-bold rounded shadow">
                             🎰 黑市物資盲盒 (100金幣)
                         </button>
-                        <button onclick="triggerMinigame('lockpick')" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 text-purple-200 font-bold rounded">
+                        <button onclick="triggerMinigame('lockpick')" id="lbl-btn-lockpick" class="px-3 py-1 bg-purple-800 hover:bg-purple-700 text-purple-200 font-bold rounded">
                             🔐 密碼鎖破解小遊戲
                         </button>
-                        <button onclick="triggerRandomEvent()" class="px-3 py-1 bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded">
+                        <button onclick="triggerRandomEvent()" id="lbl-btn-rand-evt" class="px-3 py-1 bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded">
                             🎲 觸發隨機事件
                         </button>
                     </div>
@@ -366,7 +376,7 @@
                     </div>
 
                     <div class="bg-apocalypse-950 border border-amber-500/40 p-3.5 rounded-lg text-center space-y-1">
-                        <span class="text-[11px] text-zinc-500 uppercase tracking-wider">獲得專屬稱號</span>
+                        <span id="lbl-ending-badge-hdr" class="text-[11px] text-zinc-500 uppercase tracking-wider">獲得專屬稱號</span>
                         <div id="ending-badge" class="text-lg font-bold text-amber-400 text-glow">【幸存王】</div>
                         <p id="ending-badge-desc" class="text-xs text-zinc-400 italic"></p>
                     </div>
@@ -375,7 +385,7 @@
                         <p id="ending-summary-text"></p>
                     </div>
 
-                    <button onclick="startNewGame()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">
+                    <button onclick="startNewGame()" id="lbl-btn-new-game" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">
                         重新開始新角色
                     </button>
                 </div>
@@ -388,7 +398,7 @@
             
             <div class="bg-apocalypse-950 p-3 rounded-lg border border-apocalypse-800 space-y-2">
                 <div class="flex justify-between items-center text-xs">
-                    <span class="text-amber-400 font-bold"><i class="fa-solid fa-hourglass-half mr-1"></i>剩餘天數: <span id="rt-day" class="text-sm text-zinc-100 font-mono">30</span> 天</span>
+                    <span class="text-amber-400 font-bold"><i class="fa-solid fa-hourglass-half mr-1"></i><span id="lbl-rt-days-left">剩餘天數:</span> <span id="rt-day" class="text-sm text-zinc-100 font-mono">30</span></span>
                     <span id="rt-time" class="text-xs font-mono bg-apocalypse-800 px-2 py-0.5 rounded text-amber-300">08:00</span>
                 </div>
                 <div class="flex justify-between items-center text-xs text-zinc-400">
@@ -400,29 +410,29 @@
             <!-- RPG Level & Stats Box -->
             <div class="bg-apocalypse-950 p-2.5 rounded-lg border border-amber-500/40 space-y-1.5 text-xs">
                 <div class="font-bold text-amber-400 border-b border-apocalypse-800 pb-1 flex justify-between items-center">
-                    <span>⚔️ RPG戰鬥屬性</span>
+                    <span id="lbl-rt-rpg-hdr">⚔️ RPG戰鬥屬性</span>
                     <span class="text-amber-300 font-mono">Lv.<span id="rt-level">1</span></span>
                 </div>
                 <div class="grid grid-cols-2 gap-1 text-[11px] text-zinc-300">
-                    <div>物理攻擊: <b id="rt-atk" class="text-amber-400">12</b></div>
-                    <div>物理防禦: <b id="rt-def" class="text-sky-400">3</b></div>
-                    <div>力量 (STR): <b id="rt-str" class="text-zinc-200">5</b></div>
-                    <div>體質 (VIT): <b id="rt-vit" class="text-zinc-200">5</b></div>
-                    <div>敏捷 (DEX): <b id="rt-dex" class="text-zinc-200">5</b></div>
-                    <div>屬性點: <b id="rt-statpoints" class="text-rose-400">0</b></div>
+                    <div><span id="lbl-rt-atk">物理攻擊:</span> <b id="rt-atk" class="text-amber-400">12</b></div>
+                    <div><span id="lbl-rt-def">物理防禦:</span> <b id="rt-def" class="text-sky-400">3</b></div>
+                    <div><span id="lbl-rt-str">力量 (STR):</span> <b id="rt-str" class="text-zinc-200">5</b></div>
+                    <div><span id="lbl-rt-vit">體質 (VIT):</span> <b id="rt-vit" class="text-zinc-200">5</b></div>
+                    <div><span id="lbl-rt-dex">敏捷 (DEX):</span> <b id="rt-dex" class="text-zinc-200">5</b></div>
+                    <div><span id="lbl-rt-statpoints">屬性點:</span> <b id="rt-statpoints" class="text-rose-400">0</b></div>
                 </div>
             </div>
 
             <!-- Core Body Progress Stats -->
             <div class="space-y-2 text-xs">
                 <div class="font-bold text-zinc-400 border-b border-apocalypse-800 pb-1 flex justify-between">
-                    <span>生理體徵狀態</span>
+                    <span id="lbl-rt-body-hdr">生理體徵狀態</span>
                     <span id="rt-injury-tag" class="text-emerald-400 font-normal">無傷勢</span>
                 </div>
                 
                 <div>
                     <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-zinc-300"><i class="fa-solid fa-utensils text-amber-500 mr-1"></i>飽食度</span>
+                        <span class="text-zinc-300"><i class="fa-solid fa-utensils text-amber-500 mr-1"></i><span id="lbl-rt-satiety">飽食度</span></span>
                         <span id="txt-satiety" class="font-mono text-amber-400">85/100</span>
                     </div>
                     <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
@@ -432,7 +442,7 @@
 
                 <div>
                     <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-zinc-300"><i class="fa-solid fa-droplet text-sky-400 mr-1"></i>水分值</span>
+                        <span class="text-zinc-300"><i class="fa-solid fa-droplet text-sky-400 mr-1"></i><span id="lbl-rt-thirst">水分值</span></span>
                         <span id="txt-thirst" class="font-mono text-sky-400">85/100</span>
                     </div>
                     <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
@@ -442,7 +452,7 @@
 
                 <div>
                     <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-zinc-300"><i class="fa-solid fa-bolt text-emerald-400 mr-1"></i>體力值</span>
+                        <span class="text-zinc-300"><i class="fa-solid fa-bolt text-emerald-400 mr-1"></i><span id="lbl-rt-stamina">體力值</span></span>
                         <span id="txt-stamina" class="font-mono text-emerald-400">100/100</span>
                     </div>
                     <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
@@ -452,7 +462,7 @@
 
                 <div>
                     <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-zinc-300"><i class="fa-solid fa-brain text-purple-400 mr-1"></i>精神值</span>
+                        <span class="text-zinc-300"><i class="fa-solid fa-brain text-purple-400 mr-1"></i><span id="lbl-rt-sanity">精神值</span></span>
                         <span id="txt-sanity" class="font-mono text-purple-400">90/100</span>
                     </div>
                     <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
@@ -462,7 +472,7 @@
 
                 <div>
                     <div class="flex justify-between text-[11px] mb-0.5">
-                        <span class="text-zinc-300"><i class="fa-solid fa-face-smile text-yellow-400 mr-1"></i>心情值</span>
+                        <span class="text-zinc-300"><i class="fa-solid fa-face-smile text-yellow-400 mr-1"></i><span id="lbl-rt-mood">心情值</span></span>
                         <span id="txt-mood" class="font-mono text-yellow-400">80/100</span>
                     </div>
                     <div class="w-full bg-apocalypse-950 h-2 rounded-full overflow-hidden border border-apocalypse-800">
@@ -473,11 +483,11 @@
 
             <!-- Virtual Assets -->
             <div class="bg-apocalypse-950 p-2.5 rounded-lg border border-apocalypse-800 space-y-1.5 text-xs">
-                <div class="font-bold text-zinc-400 border-b border-apocalypse-800 pb-1">資產貨幣</div>
+                <div id="lbl-rt-assets-hdr" class="font-bold text-zinc-400 border-b border-apocalypse-800 pb-1">資產貨幣</div>
                 <div class="grid grid-cols-3 gap-1 text-center font-mono">
-                    <div class="bg-apocalypse-900 p-1 rounded"><span class="text-[10px] text-zinc-500">鑽石</span><br><span id="rt-diamond" class="text-sky-400 font-bold">2</span></div>
-                    <div class="bg-apocalypse-900 p-1 rounded"><span class="text-[10px] text-zinc-500">金幣</span><br><span id="rt-gold" class="text-amber-400 font-bold">150</span></div>
-                    <div class="bg-apocalypse-900 p-1 rounded"><span class="text-[10px] text-zinc-500">銀幣</span><br><span id="rt-silver" class="text-zinc-300 font-bold">50</span></div>
+                    <div class="bg-apocalypse-900 p-1 rounded"><span id="lbl-rt-diamond" class="text-[10px] text-zinc-500">鑽石</span><br><span id="rt-diamond" class="text-sky-400 font-bold">2</span></div>
+                    <div class="bg-apocalypse-900 p-1 rounded"><span id="lbl-rt-gold" class="text-[10px] text-zinc-500">金幣</span><br><span id="rt-gold" class="text-amber-400 font-bold">150</span></div>
+                    <div class="bg-apocalypse-900 p-1 rounded"><span id="lbl-rt-silver" class="text-[10px] text-zinc-500">銀幣</span><br><span id="rt-silver" class="text-zinc-300 font-bold">50</span></div>
                 </div>
             </div>
         </aside>
@@ -489,23 +499,615 @@
         <div class="bg-apocalypse-900 border border-apocalypse-700 rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden fade-in">
             <div class="px-5 py-3 border-b border-apocalypse-700 bg-apocalypse-950 flex justify-between items-center">
                 <h3 id="modal-title" class="text-sm sm:text-base font-bold text-amber-400 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders"></i> 功能面板
+                    <i class="fa-solid fa-sliders"></i> <span id="lbl-modal-header">功能面板</span>
                 </h3>
                 <button onclick="closeModal()" class="text-zinc-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="modal-body" class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3 text-xs sm:text-sm text-zinc-300">
             </div>
-            <div class="px-4 py-2 border-t border-apocalypse-800 bg-apocalypse-950 text-[11px] text-zinc-500 text-center">
+            <div id="lbl-modal-footer" class="px-4 py-2 border-t border-apocalypse-800 bg-apocalypse-950 text-[11px] text-zinc-500 text-center">
                 資料即時同步 · 末日RPG求生
             </div>
         </div>
     </div>
 
-    <!-- GAME ENGINE CODE -->
+    <!-- GAME ENGINE CODE WITH MULTI-LANGUAGE SYSTEM -->
     <script>
+        /* ================= INTERNATIONALIZATION (I18N) DICTIONARY ================= */
+        let currentLang = 'zh-TW';
+
+        const I18N = {
+            'zh-TW': {
+                gameTitle: "末日三十天",
+                gameSubtitle: "5級盔甲+地獄開局+黑市盲盒",
+                docTitle: "末日三十天 - 五級盔甲+地獄開局+黑市盲盒+環境災害版",
+                stage: "關卡",
+                level: "等級",
+                mobInv: "背包",
+                mobStats: "狀態",
+                leftInvTitle: "背包與物資直用",
+                invCapacity: "容量",
+                tabAll: "全部",
+                tabFood: "食/水",
+                tabMedical: "醫療",
+                tabTool: "裝備/材料",
+                openWorkbench: "打開工作台合成防護裝備",
+                introTitle: "《末日三十天》極限防護升級版",
+                stutterText: "好……你好……歡迎進入《末日三十天》極限生存系統……~",
+                upgradeHeader: "最新升級內容：",
+                upg1Title: "🛡️ [五級防禦盔甲]",
+                upg1Desc: "破舊布衣 ➜ 熟皮硬甲 ➜ 重型鐵甲 ➜ 戰術合金甲 ➜ 終極動力外骨骼！",
+                upg2Title: "📦 [地獄級極少開局]",
+                upg2Desc: "開局僅有極少量基本物資，金幣僅 150，考驗你的精細算計與搜刮規劃！",
+                upg3Title: "🎰 [黑市盲盒 & 災害]",
+                upg3Desc: "流浪商人盲盒賭物資，隨機輻射酸雨與極寒暴風考驗你的盔甲防護等級！",
+                btnStartCreate: "開始創建生存角色",
+                charHeader: "基礎人設與初始屬性",
+                colItem: "項目",
+                colChoice: "自訂選擇",
+                fieldName: "1. 姓名",
+                fieldGender: "2. 性別",
+                genderMale: "男 (物理攻擊+2)",
+                genderFemale: "女 (閃避率+5%)",
+                fieldAge: "3. 年齡",
+                age1: "18-22歲 (初始體力+20)",
+                age2: "23-30歲 (各項屬性均衡)",
+                age3: "30歲以上 (初始防禦+2)",
+                fieldTalent: "4. 主角天賦",
+                talent1: "💪 強壯 (力量+3, 基礎攻擊大幅提升)",
+                talent2: "⚡ 靈敏 (敏捷+3, 閃避率提高)",
+                talent3: "🛡️ 堅韌 (體質+3, 防禦與最大體力提高)",
+                talent4: "🔧 動手能力 (合成折扣 & 暴擊+10%)",
+                btnSubmitChar: "提交人設並開啟遊戲",
+                confirmTitle: "確認開啟末日生存？",
+                btnModify: "重新修改",
+                btnConfirmStart: "正式開啟",
+                disclaimerTitle: "免責聲明與末日背景",
+                disclaimerText: "架空末日都市背景。極限物資開局，打造防禦盔甲，對抗極端天氣與闖關怪物，存活滿30天！",
+                btnLoadPlot: "載入開局劇情",
+                openingTitle: "【序章：風暴前夕】 Day 1 - 08:00",
+                openingPlot: "警報聲撕裂天空，廣播中傳來斷斷續續的警告：“請所有市民立刻封閉門窗……通訊即將中斷……”",
+                factionHeader: "請選擇生存派系：",
+                factionCons: "🏰 保守型",
+                factionConsDesc: "重囤積防禦，初始防禦+2。",
+                factionScav: "🎒 搜尋型",
+                factionScavDesc: "擅長戰鬥搜尋，初始攻擊+3。",
+                greetingBtn: "【繼續遊戲】推進劇情",
+                equippedArmor: "當前防禦裝備：",
+                noArmor: "無防具 (防禦+0)",
+                pbtnProfile: "面板",
+                pbtnBackpack: "背包",
+                pbtnQuests: "任務",
+                pbtnWorkbench: "工作台",
+                pbtnStats: "狀態",
+                pbtnNpcs: "NPC",
+                pbtnShop: "商城",
+                pbtnMap: "地圖",
+                pbtnShelter: "庇護所",
+                pbtnForecast: "天氣",
+                pbtnAchievements: "成就",
+                pbtnCodex: "圖鑑",
+                pbtnLevel: "等級",
+                pbtnCurrencies: "貨幣",
+                pbtnFactions: "派系",
+                pbtnClues: "線索",
+                panelTitleQuery: "全功能查詢面板 (16大模組)",
+                dataSync: "資料即時同步",
+                btnGamble: "🎰 黑市物資盲盒 (100金幣)",
+                btnLockpick: "🔐 密碼鎖破解小遊戲",
+                btnRandomEvt: "🎲 觸發隨機事件",
+                daysLeft: "剩餘天數:",
+                seasonFall: "深秋",
+                weatherCloudy: "陰天",
+                rpgHeader: "⚔️ RPG戰鬥屬性",
+                atk: "物理攻擊:",
+                def: "物理防禦:",
+                str: "力量 (STR):",
+                vit: "體質 (VIT):",
+                dex: "敏捷 (DEX):",
+                statPoints: "屬性點:",
+                bodyHeader: "生理體徵狀態",
+                noInjury: "無傷勢",
+                satiety: "飽食度",
+                thirst: "水分值",
+                stamina: "體力值",
+                sanity: "精神值",
+                mood: "心情值",
+                assetsHeader: "資產貨幣",
+                diamond: "鑽石",
+                gold: "金幣",
+                silver: "銀幣",
+                redWarningTitle: "生存警告：身體狀態跌破安全閾值！",
+                redWarningMsg: "您的生命體徵跌破安全線！請立刻使用背包補水、進食或睡覺休整！",
+                btnRescue: "開始救治休整",
+                panelHeader: "功能面板",
+                modalFooter: "資料即時同步 · 末日RPG求生",
+                endingTitle: "末日三十天：終章結算",
+                endingBadgeTitle: "獲得專屬稱號",
+                endingBadge: "【幸存王】",
+                btnNewGame: "重新開始新角色",
+                useBtn: "使用/對換",
+                craftBtn: "🔨 點擊合成",
+                matShort: "材料不足",
+                buyBtn: "金幣",
+                dayUnit: "天",
+
+                // Main options keys
+                actBattle: "⚔️ [闖關打怪] 挑戰第 {stg} 關怪物",
+                actDefend: "🧱 [保守] 固守房門，加固庇護所",
+                actRest4: "😴 [休息] 閉目休息 4 小時補充精力",
+                actSleep: "🌙 [睡眠] 一鍵睡覺至次日 08:00",
+                actScavenge: "🔍 [搜尋] 外出搜尋物資 (獲得材料與奇特寶物)",
+                actRadio: "📻 [電台] 電台通訊其他避難者 (解鎖好壞事件與交易)",
+                actWorkbench: "🔨 [工作台] 打開工作台合成5級防禦盔甲",
+                actShop: "🛒 [商城] 打開商城購買食品與水",
+
+                // Combat keys
+                combatTurn: "回合",
+                hp: "體力/生命",
+                monsterHp: "怪物生命",
+                btnAtk: "⚔️ 普通攻擊",
+                btnDef: "🛡️ 舉盾防禦 (減傷50%)",
+                btnBomb: "💣 使用簡易手雷 (90傷害)",
+                btnFlee: "🏃 嘗試撤退"
+            },
+            'zh-CN': {
+                gameTitle: "末日三十天",
+                gameSubtitle: "5级盔甲+地狱开局+黑市盲盒",
+                docTitle: "末日三十天 - 五级盔甲+地狱开局+黑市盲盒+环境灾害版",
+                stage: "关卡",
+                level: "等级",
+                mobInv: "背包",
+                mobStats: "状态",
+                leftInvTitle: "背包与物资直用",
+                invCapacity: "容量",
+                tabAll: "全部",
+                tabFood: "食/水",
+                tabMedical: "医疗",
+                tabTool: "装备/材料",
+                openWorkbench: "打开工作台合成防护装备",
+                introTitle: "《末日三十天》极限防护升级版",
+                stutterText: "好……你好……欢迎进入《末日三十天》极限生存系统……~",
+                upgradeHeader: "最新升级内容：",
+                upg1Title: "🛡️ [五级防护盔甲]",
+                upg1Desc: "破旧布衣 ➜ 熟皮硬甲 ➜ 重型铁甲 ➜ 战术合金甲 ➜ 终极动力外骨骼！",
+                upg2Title: "📦 [地狱级极少开局]",
+                upg2Desc: "开局仅有极少量基本物资，金币仅 150，考验你的精细算计与搜刮规划！",
+                upg3Title: "🎰 [黑市盲盒 & 灾害]",
+                upg3Desc: "流浪商人盲盒赌物资，随机辐射酸雨与极寒暴风考验你的盔甲防护等级！",
+                btnStartCreate: "开始创建生存角色",
+                charHeader: "基础人设与初始属性",
+                colItem: "项目",
+                colChoice: "自定选择",
+                fieldName: "1. 姓名",
+                fieldGender: "2. 性别",
+                genderMale: "男 (物理攻击+2)",
+                genderFemale: "女 (闪避率+5%)",
+                fieldAge: "3. 年龄",
+                age1: "18-22岁 (初始体力+20)",
+                age2: "23-30岁 (各项属性均衡)",
+                age3: "30岁以上 (初始防御+2)",
+                fieldTalent: "4. 主角天赋",
+                talent1: "💪 强壮 (力量+3, 基础攻击大幅提升)",
+                talent2: "⚡ 灵敏 (敏捷+3, 闪避率提高)",
+                talent3: "🛡️ 坚韧 (体质+3, 防御与最大体力提高)",
+                talent4: "🔧 动手能力 (合成折扣 & 暴击+10%)",
+                btnSubmitChar: "提交人设并开启游戏",
+                confirmTitle: "确认开启末日生存？",
+                btnModify: "重新修改",
+                btnConfirmStart: "正式开启",
+                disclaimerTitle: "免责声明与末日背景",
+                disclaimerText: "架空末日都市背景。极限物资开局，打造防护盔甲，对抗极端天气与闯关怪物，存活满30天！",
+                btnLoadPlot: "载入开局剧情",
+                openingTitle: "【序章：风暴前夕】 Day 1 - 08:00",
+                openingPlot: "警报声撕裂天空，广播中传来断断续续的警告：“请所有市民立刻封闭门窗……通讯即将中断……”",
+                factionHeader: "请选择生存派系：",
+                factionCons: "🏰 保守型",
+                factionConsDesc: "重囤积防护，初始防御+2。",
+                factionScav: "🎒 搜寻型",
+                factionScavDesc: "擅长战斗搜寻，初始攻击+3。",
+                greetingBtn: "【继续游戏】推进剧情",
+                equippedArmor: "当前防护装备：",
+                noArmor: "无防具 (防御+0)",
+                pbtnProfile: "面板",
+                pbtnBackpack: "背包",
+                pbtnQuests: "任务",
+                pbtnWorkbench: "工作台",
+                pbtnStats: "状态",
+                pbtnNpcs: "NPC",
+                pbtnShop: "商城",
+                pbtnMap: "地图",
+                pbtnShelter: "庇护所",
+                pbtnForecast: "天气",
+                pbtnAchievements: "成就",
+                pbtnCodex: "图鉴",
+                pbtnLevel: "等级",
+                pbtnCurrencies: "货币",
+                pbtnFactions: "派系",
+                pbtnClues: "线索",
+                panelTitleQuery: "全功能查询面板 (16大模块)",
+                dataSync: "数据实时同步",
+                btnGamble: "🎰 黑市物资盲盒 (100金币)",
+                btnLockpick: "🔐 密码锁破解小游戏",
+                btnRandomEvt: "🎲 触发随机事件",
+                daysLeft: "剩余天数:",
+                seasonFall: "深秋",
+                weatherCloudy: "阴天",
+                rpgHeader: "⚔️ RPG战斗属性",
+                atk: "物理攻击:",
+                def: "物理防御:",
+                str: "力量 (STR):",
+                vit: "体质 (VIT):",
+                dex: "敏捷 (DEX):",
+                statPoints: "属性点:",
+                bodyHeader: "生理体征状态",
+                noInjury: "无伤势",
+                satiety: "饱食度",
+                thirst: "水分值",
+                stamina: "体力值",
+                sanity: "精神值",
+                mood: "心情值",
+                assetsHeader: "资产货币",
+                diamond: "钻石",
+                gold: "金币",
+                silver: "银币",
+                redWarningTitle: "生存警告：身体状态跌破安全阈值！",
+                redWarningMsg: "您的生命体征跌破安全线！请立刻使用背包补水、进食或睡觉休整！",
+                btnRescue: "开始救治休整",
+                panelHeader: "功能面板",
+                modalFooter: "数据实时同步 · 末日RPG求生",
+                endingTitle: "末日三十天：终章结算",
+                endingBadgeTitle: "获得专属称号",
+                endingBadge: "【幸存王】",
+                btnNewGame: "重新开始新角色",
+                useBtn: "使用/对换",
+                craftBtn: "🔨 点击合成",
+                matShort: "材料不足",
+                buyBtn: "金币",
+                dayUnit: "天",
+
+                // Main options keys
+                actBattle: "⚔️ [闯关打怪] 挑战第 {stg} 关怪物",
+                actDefend: "🧱 [保守] 固守房门，加固庇护所",
+                actRest4: "😴 [休息] 闭目休息 4 小时补充精力",
+                actSleep: "🌙 [睡眠] 一键睡觉至次日 08:00",
+                actScavenge: "🔍 [搜寻] 外出搜寻物资 (获得材料与奇特宝物)",
+                actRadio: "📻 [电台] 电台通讯其他避难者 (解锁好坏事件与交易)",
+                actWorkbench: "🔨 [工作台] 打开工作台合成5级防护盔甲",
+                actShop: "🛒 [商城] 打开商城购买食品与水",
+
+                // Combat keys
+                combatTurn: "回合",
+                hp: "体力/生命",
+                monsterHp: "怪物生命",
+                btnAtk: "⚔️ 普通攻击",
+                btnDef: "🛡️ 举盾防御 (减伤50%)",
+                btnBomb: "💣 使用简易手雷 (90伤害)",
+                btnFlee: "🏃 尝试撤退"
+            },
+            'en': {
+                gameTitle: "Apocalypse 30 Days",
+                gameSubtitle: "Tier 5 Armor + Hell Start + Black Market",
+                docTitle: "Apocalypse 30 Days - Extreme Defense Edition",
+                stage: "Stage",
+                level: "Level",
+                mobInv: "Items",
+                mobStats: "Stats",
+                leftInvTitle: "Inventory & Quick Use",
+                invCapacity: "Cap",
+                tabAll: "All",
+                tabFood: "Food/Water",
+                tabMedical: "Medical",
+                tabTool: "Gear/Mats",
+                openWorkbench: "Open Workbench to Craft Armor",
+                introTitle: "《Apocalypse 30 Days》 Extreme Defense",
+                stutterText: "H-Hello... Welcome to the Apocalypse 30 Days Survival System...~",
+                upgradeHeader: "Latest Features:",
+                upg1Title: "🛡️ [Tier 5 Armor Crafting]",
+                upg1Desc: "Ragged Clothes ➜ Leather Armor ➜ Iron Armor ➜ Alloy Armor ➜ Power Exoskeleton!",
+                upg2Title: "📦 [Hell Mode Extreme Start]",
+                upg2Desc: "Minimal starting supplies & only 150 gold. Test your planning and scavenging!",
+                upg3Title: "🎰 [Black Market & Hazards]",
+                upg3Desc: "Mystery boxes, random acid rain and blizzard test your armor defense tier!",
+                btnStartCreate: "Create Survivor Character",
+                charHeader: "Basic Info & Stats",
+                colItem: "Attribute",
+                colChoice: "Selection",
+                fieldName: "1. Name",
+                fieldGender: "2. Gender",
+                genderMale: "Male (ATK +2)",
+                genderFemale: "Female (Dodge +5%)",
+                fieldAge: "3. Age",
+                age1: "18-22 Yrs (Stamina +20)",
+                age2: "23-30 Yrs (Balanced Stats)",
+                age3: "30+ Yrs (DEF +2)",
+                fieldTalent: "4. Talent",
+                talent1: "💪 Strong (STR +3, High Base ATK)",
+                talent2: "⚡ Agile (DEX +3, High Dodge)",
+                talent3: "🛡️ Tough (VIT +3, High DEF & Stamina)",
+                talent4: "🔧 Craftsmanship (Craft Discount & Crit +10%)",
+                btnSubmitChar: "Submit Character & Start",
+                confirmTitle: "Confirm Starting Apocalypse Survival?",
+                btnModify: "Edit Character",
+                btnConfirmStart: "Start Game",
+                disclaimerTitle: "Disclaimer & Background",
+                disclaimerText: "Fictional apocalyptic setting. Extreme low resources. Build armor, survive weather and monsters for 30 days!",
+                btnLoadPlot: "Load Opening Story",
+                openingTitle: "【Prologue: Before the Storm】 Day 1 - 08:00",
+                openingPlot: "Sirens tear through the sky, emergency broadcast warns: 'All citizens lock doors and windows... Communications shutting down...'",
+                factionHeader: "Choose Survival Faction:",
+                factionCons: "🏰 Conservative",
+                factionConsDesc: "Defense & hoarding focus. DEF +2.",
+                factionScav: "🎒 Scavenger",
+                factionScavDesc: "Combat & looting focus. ATK +3.",
+                greetingBtn: "【Continue】 Advance Story",
+                equippedArmor: "Equipped Armor:",
+                noArmor: "None (DEF +0)",
+                pbtnProfile: "Profile",
+                pbtnBackpack: "Inventory",
+                pbtnQuests: "Quests",
+                pbtnWorkbench: "Workbench",
+                pbtnStats: "Vitals",
+                pbtnNpcs: "NPCs",
+                pbtnShop: "Shop",
+                pbtnMap: "Map",
+                pbtnShelter: "Shelter",
+                pbtnForecast: "Weather",
+                pbtnAchievements: "Badges",
+                pbtnCodex: "Codex",
+                pbtnLevel: "Level Up",
+                pbtnCurrencies: "Assets",
+                pbtnFactions: "Factions",
+                pbtnClues: "Clues",
+                panelTitleQuery: "All Panels (16 Modules)",
+                dataSync: "Real-time Sync",
+                btnGamble: "🎰 Mystery Box (100 Gold)",
+                btnLockpick: "🔐 Lockpick Minigame",
+                btnRandomEvt: "🎲 Random Event",
+                daysLeft: "Days Left:",
+                seasonFall: "Autumn",
+                weatherCloudy: "Cloudy",
+                rpgHeader: "⚔️ RPG Combat Stats",
+                atk: "ATK:",
+                def: "DEF:",
+                str: "STR:",
+                vit: "VIT:",
+                dex: "DEX:",
+                statPoints: "Stat Pts:",
+                bodyHeader: "Physiological Vitals",
+                noInjury: "Healthy",
+                satiety: "Satiety",
+                thirst: "Hydration",
+                stamina: "Stamina",
+                sanity: "Sanity",
+                mood: "Mood",
+                assetsHeader: "Currencies",
+                diamond: "Diamonds",
+                gold: "Gold",
+                silver: "Silver",
+                redWarningTitle: "WARNING: Vital signs critical!",
+                redWarningMsg: "Your vital signs dropped below safe threshold! Hydrate, eat, or sleep immediately!",
+                btnRescue: "Begin Recovery",
+                panelHeader: "Panel",
+                modalFooter: "Real-time Sync · Apocalypse RPG",
+                endingTitle: "Apocalypse 30 Days: Evaluation",
+                endingBadgeTitle: "Title Unlocked",
+                endingBadge: "【Survivor King】",
+                btnNewGame: "Start New Character",
+                useBtn: "Use",
+                craftBtn: "🔨 Craft",
+                matShort: "Need Mats",
+                buyBtn: "Gold",
+                dayUnit: "Days",
+
+                // Main options keys
+                actBattle: "⚔️ [Battle] Challenge Stage {stg} Monster",
+                actDefend: "🧱 [Fortify] Reinforce Shelter Defense",
+                actRest4: "😴 [Rest] Rest for 4 Hours",
+                actSleep: "🌙 [Sleep] Sleep until 08:00 next day",
+                actScavenge: "🔍 [Scavenge] Explore for Materials & Loot",
+                actRadio: "📻 [Radio] Contact Survivors & Radio Events",
+                actWorkbench: "🔨 [Workbench] Craft Tier 1-5 Armor",
+                actShop: "🛒 [Shop] Purchase Food & Supplies",
+
+                // Combat keys
+                combatTurn: "Turn",
+                hp: "Stamina/HP",
+                monsterHp: "Monster HP",
+                btnAtk: "⚔️ Attack",
+                btnDef: "🛡️ Shield Defend (-50% Dmg)",
+                btnBomb: "💣 Throw Grenade (90 Dmg)",
+                btnFlee: "🏃 Attempt Escape"
+            }
+        };
+
+        const ITEMS_I18N = {
+            'water': { 'zh-TW': { name: '純淨水', effect: '水分 +30' }, 'zh-CN': { name: '纯净水', effect: '水分 +30' }, 'en': { name: 'Purified Water', effect: 'Hydration +30' } },
+            'biscuit': { 'zh-TW': { name: '壓縮餅乾', effect: '飽食度 +25' }, 'zh-CN': { name: '压缩饼干', effect: '饱食度 +25' }, 'en': { name: 'Hardtack Biscuit', effect: 'Satiety +25' } },
+            'canned': { 'zh-TW': { name: '高能肉類罐頭', effect: '飽食度 +40' }, 'zh-CN': { name: '高能肉类罐头', effect: '饱食度 +40' }, 'en': { name: 'Canned Meat', effect: 'Satiety +40' } },
+            'wood': { 'zh-TW': { name: '原木材', effect: 'MC基礎材料' }, 'zh-CN': { name: '原木材', effect: 'MC基础材料' }, 'en': { name: 'Wood Logs', effect: 'Basic Crafting Mat' } },
+            'screw': { 'zh-TW': { name: '螺絲零件', effect: '基礎材料' }, 'zh-CN': { name: '螺丝零件', effect: '基础材料' }, 'en': { name: 'Screws & Parts', effect: 'Basic Crafting Mat' } },
+            'cloth': { 'zh-TW': { name: '強韌布料', effect: '防具材料' }, 'zh-CN': { name: '强韧布料', effect: '防具材料' }, 'en': { name: 'Tough Cloth', effect: 'Armor Crafting Mat' } },
+            'leather': { 'zh-TW': { name: '變異皮革', effect: '防具材料' }, 'zh-CN': { name: '变异皮革', effect: '防具材料' }, 'en': { name: 'Mutant Leather', effect: 'Armor Crafting Mat' } },
+            'iron': { 'zh-TW': { name: '精鍛鐵塊', effect: 'MC鍛造材料' }, 'zh-CN': { name: '精锻铁块', effect: 'MC锻造材料' }, 'en': { name: 'Forged Iron Ingot', effect: 'Forging Mat' } },
+            'alloy': { 'zh-TW': { name: '合金板材', effect: '高階防具合成材料' }, 'zh-CN': { name: '合金板材', effect: '高阶防具合成材料' }, 'en': { name: 'Alloy Plate', effect: 'Advanced Armor Mat' } },
+            'chip': { 'zh-TW': { name: '高階晶片', effect: '高科技組裝材料' }, 'zh-CN': { name: '高阶芯片', effect: '高科技组装材料' }, 'en': { name: 'Advanced Microchip', effect: 'High-Tech Mat' } },
+            'circuit': { 'zh-TW': { name: '電子元件', effect: '高科技組裝材料' }, 'zh-CN': { name: '电子元件', effect: '高科技组装材料' }, 'en': { name: 'Electronic Circuit', effect: 'High-Tech Mat' } },
+            'herb': { 'zh-TW': { name: '野生草藥', effect: '藥劑製作材料' }, 'zh-CN': { name: '野生草药', effect: '药剂制作材料' }, 'en': { name: 'Wild Herbs', effect: 'Alchemy Mat' } },
+            'herb_salve': { 'zh-TW': { name: '自製草藥膏', effect: '傷勢 -15' }, 'zh-CN': { name: '自制草药膏', effect: '伤势 -15' }, 'en': { name: 'Herbal Salve', effect: 'Injuries -15' } },
+            'bandage': { 'zh-TW': { name: '醫用紗布', effect: '傷勢 -20' }, 'zh-CN': { name: '医用纱布', effect: '伤势 -20' }, 'en': { name: 'Medical Bandage', effect: 'Injuries -20' } },
+            'medkit': { 'zh-TW': { name: '軍用急救箱', effect: '傷勢清零' }, 'zh-CN': { name: '军用急救箱', effect: '伤势清零' }, 'en': { name: 'Military Medkit', effect: 'Heal All Injuries' } },
+            'bomb': { 'zh-TW': { name: '簡易手雷', effect: '戰鬥爆破90傷害' }, 'zh-CN': { name: '简易手雷', effect: '战斗爆破90伤害' }, 'en': { name: 'Improvised Grenade', effect: 'Deals 90 Bomb Dmg' } },
+            'armor_t1': { 'zh-TW': { name: '破舊布衣', effect: '防禦+5, 體力上限+10' }, 'zh-CN': { name: '破旧布衣', effect: '防御+5, 体力上限+10' }, 'en': { name: 'Ragged Clothes', effect: 'DEF +5, Max Stamina +10' } },
+            'armor_t2': { 'zh-TW': { name: '熟皮硬甲', effect: '防禦+12, 體力上限+25' }, 'zh-CN': { name: '熟皮硬甲', effect: '防御+12, 体力上限+25' }, 'en': { name: 'Hardened Leather Armor', effect: 'DEF +12, Max Stamina +25' } },
+            'armor_t3': { 'zh-TW': { name: '重型精鍛鐵甲', effect: '防禦+22, 體力上限+45' }, 'zh-CN': { name: '重型精锻铁甲', effect: '防御+22, 体力上限+45' }, 'en': { name: 'Heavy Forged Iron Armor', effect: 'DEF +22, Max Stamina +45' } },
+            'armor_t4': { 'zh-TW': { name: '戰術合金複合甲', effect: '防禦+38, 體力上限+70' }, 'zh-CN': { name: '战术合金复合甲', effect: '防御+38, 体力上限+70' }, 'en': { name: 'Tactical Alloy Composite Armor', effect: 'DEF +38, Max Stamina +70' } },
+            'armor_t5': { 'zh-TW': { name: '終極動力外骨骼', effect: '防禦+60, 體力+120, 攻擊+15' }, 'zh-CN': { name: '终极动力外骨骼', effect: '防御+60, 体力+120, 攻击+15' }, 'en': { name: 'Ultimate Power Exoskeleton', effect: 'DEF +60, Max Stamina +120, ATK +15' } },
+            'iron_sword': { 'zh-TW': { name: '精鍛鐵劍', effect: '攻擊力 +10' }, 'zh-CN': { name: '精锻铁剑', effect: '攻击力 +10' }, 'en': { name: 'Forged Iron Sword', effect: 'ATK +10' } },
+            'dirty_duck': { 'zh-TW': { name: '橡膠小黃鴨', effect: '按壓發出嘎嘎聲，心情 +20', desc: '末日裡的解壓玩具。' }, 'zh-CN': { name: '橡胶小黄鸭', effect: '按压发出嘎嘎声，心情 +20', desc: '末日里的解压玩具。' }, 'en': { name: 'Rubber Duck', effect: 'Squeak squeak! Mood +20', desc: 'Stress relief toy.' } },
+            'strange_mushroom': { 'zh-TW': { name: '發光奇異蘑菇', effect: '解毒生津，心情 +15', desc: '散發微弱藍光。' }, 'zh-CN': { name: '发光奇异蘑菇', effect: '解毒生津，心情 +15', desc: '散发微弱蓝光。' }, 'en': { name: 'Glowing Mushroom', effect: 'Refreshing. Mood +15', desc: 'Emits a faint blue glow.' } },
+            'gameboy': { 'zh-TW': { name: '破舊掌上遊戲機', effect: '打一把遊戲，心情 +30', desc: '居然還有電！' }, 'zh-CN': { name: '破旧掌上游戏机', effect: '打一把游戏，心情 +30', desc: '居然还有电！' }, 'en': { name: 'Retro Handheld Game', effect: 'Play a game. Mood +30', desc: 'Still has battery!' } },
+            'gold_watch': { 'zh-TW': { name: '鍍金懷錶', effect: '可直接兌換 500 金幣', desc: '舊時代精美懷錶。' }, 'zh-CN': { name: '镀金怀表', effect: '可直接兑换 500 金币', desc: '旧时代精美怀表。' }, 'en': { name: 'Gold Pocket Watch', effect: 'Exchange for 500 Gold', desc: 'Exquisite antique watch.' } }
+        };
+
+        function getItemTranslation(itemId, field) {
+            if (ITEMS_I18N[itemId] && ITEMS_I18N[itemId][currentLang]) {
+                return ITEMS_I18N[itemId][currentLang][field] || '';
+            }
+            return '';
+        }
+
+        function setElemText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.innerText = text;
+        }
+
+        function setElemHTML(id, html) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
+        }
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            const dict = I18N[lang];
+            if (!dict) return;
+
+            document.documentElement.lang = (lang === 'zh-CN') ? 'zh-CN' : ((lang === 'en') ? 'en' : 'zh-TW');
+
+            // Header & Subtitles
+            setElemText('doc-title', dict.docTitle);
+            setElemText('hdr-game-title', dict.gameTitle);
+            setElemText('hdr-game-subtitle', dict.gameSubtitle);
+            setElemText('lbl-hdr-stage', dict.stage);
+            setElemText('lbl-hdr-level', dict.level);
+            setElemText('lbl-mob-inv', dict.mobInv);
+            setElemText('lbl-mob-stats', dict.mobStats);
+
+            // Left Sidebar
+            setElemText('lbl-left-inv-title', dict.leftInvTitle);
+            setElemText('inv-tab-all', dict.tabAll);
+            setElemText('inv-tab-food', dict.tabFood);
+            setElemText('inv-tab-medical', dict.tabMedical);
+            setElemText('inv-tab-tool', dict.tabTool);
+            setElemText('lbl-left-wb-btn', dict.openWorkbench);
+
+            // Intro Page
+            setElemHTML('intro-title', `<i class="fa-solid fa-biohazard"></i> ${dict.introTitle}`);
+            setElemText('lbl-intro-upgrade-hdr', dict.upgradeHeader);
+            setElemText('lbl-upg1-title', dict.upg1Title);
+            setElemText('lbl-upg1-desc', dict.upg1Desc);
+            setElemText('lbl-upg2-title', dict.upg2Title);
+            setElemText('lbl-upg2-desc', dict.upg2Desc);
+            setElemText('lbl-upg3-title', dict.upg3Title);
+            setElemText('lbl-upg3-desc', dict.upg3Desc);
+            setElemText('lbl-btn-start-create', dict.btnStartCreate);
+
+            // Char Creation
+            setElemHTML('lbl-char-header', `<i class="fa-solid fa-user-gear"></i> ${dict.charHeader}`);
+            setElemText('lbl-col-item', dict.colItem);
+            setElemText('lbl-col-choice', dict.colChoice);
+            setElemText('lbl-field-name', dict.fieldName);
+            setElemText('lbl-field-gender', dict.fieldGender);
+            setElemText('lbl-gender-male', dict.genderMale);
+            setElemText('lbl-gender-female', dict.genderFemale);
+            setElemText('lbl-field-age', dict.fieldAge);
+            setElemText('lbl-age-1', dict.age1);
+            setElemText('lbl-age-2', dict.age2);
+            setElemText('lbl-age-3', dict.age3);
+            setElemText('lbl-field-talent', dict.fieldTalent);
+            setElemText('lbl-talent-1', dict.talent1);
+            setElemText('lbl-talent-2', dict.talent2);
+            setElemText('lbl-talent-3', dict.talent3);
+            setElemText('lbl-talent-4', dict.talent4);
+            setElemText('lbl-btn-submit-char', dict.btnSubmitChar);
+
+            // Confirm Modal
+            setElemText('lbl-confirm-title', dict.confirmTitle);
+            setElemText('lbl-btn-modify', dict.btnModify);
+            setElemText('lbl-btn-confirm-start', dict.btnConfirmStart);
+
+            // Disclaimer & Opening
+            setElemHTML('lbl-disclaimer-title', `<i class="fa-solid fa-shield-halved"></i> ${dict.disclaimerTitle}`);
+            setElemText('lbl-disclaimer-text', dict.disclaimerText);
+            setElemText('lbl-btn-load-plot', dict.btnLoadPlot);
+            setElemText('lbl-opening-title', dict.openingTitle);
+            setElemText('opening-plot-text', dict.openingPlot);
+            setElemText('lbl-faction-hdr', dict.factionHeader);
+            setElemText('lbl-faction-cons', dict.factionCons);
+            setElemText('lbl-faction-cons-desc', dict.factionConsDesc);
+            setElemText('lbl-faction-scav', dict.factionScav);
+            setElemText('lbl-faction-scav-desc', dict.factionScavDesc);
+            setElemText('lbl-greeting-btn', dict.greetingBtn);
+
+            // Main Game Toolbar
+            setElemText('lbl-equipped-armor-hdr', dict.equippedArmor);
+            setElemText('lbl-panel-title-query', dict.panelTitleQuery);
+            setElemText('lbl-data-sync', dict.dataSync);
+            setElemText('pbtn-profile', dict.pbtnProfile);
+            setElemText('pbtn-backpack', dict.pbtnBackpack);
+            setElemText('pbtn-quests', dict.pbtnQuests);
+            setElemText('pbtn-workbench', dict.pbtnWorkbench);
+            setElemText('pbtn-stats', dict.pbtnStats);
+            setElemText('pbtn-npcs', dict.pbtnNpcs);
+            setElemText('pbtn-shop', dict.pbtnShop);
+            setElemText('pbtn-map', dict.pbtnMap);
+            setElemText('pbtn-shelter', dict.pbtnShelter);
+            setElemText('pbtn-forecast', dict.pbtnForecast);
+            setElemText('pbtn-achievements', dict.pbtnAchievements);
+            setElemText('pbtn-codex', dict.pbtnCodex);
+            setElemText('pbtn-level', dict.pbtnLevel);
+            setElemText('pbtn-currencies', dict.pbtnCurrencies);
+            setElemText('pbtn-factions', dict.pbtnFactions);
+            setElemText('pbtn-clues', dict.pbtnClues);
+            setElemText('lbl-btn-gamble', dict.btnGamble);
+            setElemText('lbl-btn-lockpick', dict.btnLockpick);
+            setElemText('lbl-btn-rand-evt', dict.btnRandomEvt);
+
+            // Right Sidebar Status
+            setElemText('lbl-rt-days-left', dict.daysLeft);
+            setElemText('lbl-rt-rpg-hdr', dict.rpgHeader);
+            setElemText('lbl-rt-atk', dict.atk);
+            setElemText('lbl-rt-def', dict.def);
+            setElemText('lbl-rt-str', dict.str);
+            setElemText('lbl-rt-vit', dict.vit);
+            setElemText('lbl-rt-dex', dict.dex);
+            setElemText('lbl-rt-statpoints', dict.statPoints);
+            setElemText('lbl-rt-body-hdr', dict.bodyHeader);
+            setElemText('lbl-rt-satiety', dict.satiety);
+            setElemText('lbl-rt-thirst', dict.thirst);
+            setElemText('lbl-rt-stamina', dict.stamina);
+            setElemText('lbl-rt-sanity', dict.sanity);
+            setElemText('lbl-rt-mood', dict.mood);
+            setElemText('lbl-rt-assets-hdr', dict.assetsHeader);
+            setElemText('lbl-rt-diamond', dict.diamond);
+            setElemText('lbl-rt-gold', dict.gold);
+            setElemText('lbl-rt-silver', dict.silver);
+
+            // Modals & Endings
+            setElemText('lbl-red-warning-title', dict.redWarningTitle);
+            setElemText('red-warning-msg', dict.redWarningMsg);
+            setElemText('lbl-btn-rescue', dict.btnRescue);
+            setElemText('lbl-modal-header', dict.panelHeader);
+            setElemText('lbl-modal-footer', dict.modalFooter);
+            setElemText('ending-title', dict.endingTitle);
+            setElemText('lbl-ending-badge-hdr', dict.endingBadgeTitle);
+            setElemText('ending-badge', dict.endingBadge);
+            setElemText('lbl-btn-new-game', dict.btnNewGame);
+
+            recalculatePlayerStats();
+            renderLeftInventory();
+            updateRightStatusPanel();
+
+            const mainGameSec = document.getElementById('sec-main-game');
+            if (mainGameSec && !mainGameSec.classList.contains('hidden')) {
+                const hourStr = `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`;
+                renderDefaultOptions("Status updated.", hourStr);
+            }
+        }
+
         /* ================= GAME STATE OBJECT ================= */
         let gameState = {
-            dungeonStage: 1, // 闖關模式當前關卡
+            dungeonStage: 1,
             player: {
                 name: '陳默',
                 gender: '男',
@@ -513,7 +1115,6 @@
                 talent: '動手能力',
                 faction: '保守型',
                 
-                // RPG Level & Stats
                 level: 1,
                 xp: 0,
                 maxXp: 100,
@@ -541,15 +1142,13 @@
                 temp: 14,
                 period: '白天'
             },
-            // 極少物資開局：金幣從1500減為150，鑽石從10減為2
             currencies: { diamond: 2, gold: 150, silver: 50 },
             shelter: { name: '安全住宅庇護點', durability: 80, stealth: 60, underFloors: 0 },
-            // 背包極低開局物資
             inventory: [
-                { id: 'water', name: '純淨水', cat: 'food', qty: 1, effect: '水分 +30' },
-                { id: 'biscuit', name: '壓縮餅乾', cat: 'food', qty: 1, effect: '飽食度 +25' },
-                { id: 'wood', name: '原木材', cat: 'tool', qty: 2, effect: 'MC基礎材料' },
-                { id: 'screw', name: '螺絲零件', cat: 'tool', qty: 1, effect: '基礎材料' }
+                { id: 'water', cat: 'food', qty: 1 },
+                { id: 'biscuit', cat: 'food', qty: 1 },
+                { id: 'wood', cat: 'tool', qty: 2 },
+                { id: 'screw', cat: 'tool', qty: 1 }
             ],
             inventoryFilter: 'all',
             npcs: {
@@ -576,39 +1175,34 @@
 
         /* ================= 5 TIERS OF DEFENSIVE ARMOR & RECIPES ================= */
         const WORKBENCH_RECIPES = [
-            // ----- 5級防禦盔甲合成鏈 (難度提升) -----
-            { id: 'r_armor_t1', name: '🧥 [T1 盔甲] 破舊布衣', desc: '防禦力 +5，體力上限 +10', materials: [{ id: 'cloth', name: '強韌布料', qty: 5 }], output: { id: 'armor_t1', name: '破舊布衣', cat: 'tool', qty: 1, effect: '防禦+5, 體力上限+10' } },
-            { id: 'r_armor_t2', name: '🛡️ [T2 盔甲] 熟皮硬甲', desc: '防禦力 +12，體力上限 +25', materials: [{ id: 'leather', name: '變異皮革', qty: 5 }, { id: 'cloth', name: '強韌布料', qty: 3 }, { id: 'screw', name: '螺絲零件', qty: 4 }], output: { id: 'armor_t2', name: '熟皮硬甲', cat: 'tool', qty: 1, effect: '防禦+12, 體力上限+25' } },
-            { id: 'r_armor_t3', name: '🦾 [T3 盔甲] 重型精鍛鐵甲', desc: '防禦力 +22，體力上限 +45', materials: [{ id: 'iron', name: '精鍛鐵塊', qty: 6 }, { id: 'wood', name: '原木材', qty: 6 }, { id: 'screw', name: '螺絲零件', qty: 6 }], output: { id: 'armor_t3', name: '重型精鍛鐵甲', cat: 'tool', qty: 1, effect: '防禦+22, 體力上限+45' } },
-            { id: 'r_armor_t4', name: '🥼 [T4 盔甲] 戰術合金複合甲', desc: '防禦力 +38，體力上限 +70', materials: [{ id: 'alloy', name: '合金板材', qty: 4 }, { id: 'leather', name: '變異皮革', qty: 4 }, { id: 'screw', name: '螺絲零件', qty: 8 }], output: { id: 'armor_t4', name: '戰術合金複合甲', cat: 'tool', qty: 1, effect: '防禦+38, 體力上限+70' } },
-            { id: 'r_armor_t5', name: '⚡ [T5 盔甲] 終極動力外骨骼', desc: '防禦力 +60，體力上限 +120，物理攻擊 +15！', materials: [{ id: 'alloy', name: '合金板材', qty: 8 }, { id: 'chip', name: '高階晶片', qty: 3 }, { id: 'circuit', name: '電子元件', qty: 6 }, { id: 'screw', name: '螺絲零件', qty: 12 }], output: { id: 'armor_t5', name: '終極動力外骨骼', cat: 'tool', qty: 1, effect: '防禦+60, 體力+120, 攻擊+15' } },
-
-            // ----- 複合中間加工材料 (提高合成難度) -----
-            { id: 'r_alloy', name: '⚙️ [中間材料] 合金板材', desc: '製造高階 T4/T5 盔甲核心材料', materials: [{ id: 'iron', name: '精鍛鐵塊', qty: 3 }, { id: 'circuit', name: '電子元件', qty: 2 }], output: { id: 'alloy', name: '合金板材', cat: 'tool', qty: 1, effect: '高階防具合成材料' } },
-            { id: 'r_chip', name: '💾 [中間材料] 高階晶片', desc: '動力外骨骼與高科技裝備組件', materials: [{ id: 'circuit', name: '電子元件', qty: 4 }, { id: 'screw', name: '螺絲零件', qty: 4 }], output: { id: 'chip', name: '高階晶片', cat: 'tool', qty: 1, effect: '高科技組裝材料' } },
-
-            // ----- 經典武器與藥劑 -----
-            { id: 'r_iron_sword', name: '⚔️ 精鍛鐵劍', desc: '物理攻擊 +10', materials: [{ id: 'iron', name: '精鍛鐵塊', qty: 4 }, { id: 'wood', name: '原木材', qty: 2 }], output: { id: 'iron_sword', name: '精鍛鐵劍', cat: 'tool', qty: 1, effect: '攻擊力 +10' } },
-            { id: 'r_herb_salve', name: '💊 自製草藥膏', desc: '減輕傷勢 -15', materials: [{ id: 'herb', name: '野生草藥', qty: 2 }, { id: 'water', name: '純淨水', qty: 1 }], output: { id: 'herb_salve', name: '自製草藥膏', cat: 'medical', qty: 1, effect: '傷勢 -15' } },
-            { id: 'r_medkit', name: '🏥 軍用急救箱', desc: '傷勢清零，體力+30', materials: [{ id: 'bandage', name: '醫用紗布', qty: 2 }, { id: 'herb', name: '野生草藥', qty: 2 }], output: { id: 'medkit', name: '軍用急救箱', cat: 'medical', qty: 1, effect: '傷勢清零' } },
-            { id: 'r_bomb', name: '💣 簡易手雷', desc: '戰鬥消耗品，造成 90 點炸裂傷害', materials: [{ id: 'circuit', name: '電子元件', qty: 1 }, { id: 'screw', name: '螺絲零件', qty: 3 }], output: { id: 'bomb', name: '簡易手雷', cat: 'tool', qty: 1, effect: '戰鬥爆破90傷害' } }
+            { id: 'r_armor_t1', name: '🧥 [T1 盔甲] 破舊布衣', desc: '防禦力 +5，體力上限 +10', materials: [{ id: 'cloth', name: '強韌布料', qty: 5 }], output: { id: 'armor_t1', cat: 'tool', qty: 1 } },
+            { id: 'r_armor_t2', name: '🛡️ [T2 盔甲] 熟皮硬甲', desc: '防禦力 +12，體力上限 +25', materials: [{ id: 'leather', name: '變異皮革', qty: 5 }, { id: 'cloth', name: '強韌布料', qty: 3 }, { id: 'screw', name: '螺絲零件', qty: 4 }], output: { id: 'armor_t2', cat: 'tool', qty: 1 } },
+            { id: 'r_armor_t3', name: '🦾 [T3 盔甲] 重型精鍛鐵甲', desc: '防禦力 +22，體力上限 +45', materials: [{ id: 'iron', name: '精鍛鐵塊', qty: 6 }, { id: 'wood', name: '原木材', qty: 6 }, { id: 'screw', name: '螺絲零件', qty: 6 }], output: { id: 'armor_t3', cat: 'tool', qty: 1 } },
+            { id: 'r_armor_t4', name: '🥼 [T4 盔甲] 戰術合金複合甲', desc: '防禦力 +38，體力上限 +70', materials: [{ id: 'alloy', name: '合金板材', qty: 4 }, { id: 'leather', name: '變異皮革', qty: 4 }, { id: 'screw', name: '螺絲零件', qty: 8 }], output: { id: 'armor_t4', cat: 'tool', qty: 1 } },
+            { id: 'r_armor_t5', name: '⚡ [T5 盔甲] 終極動力外骨骼', desc: '防禦力 +60，體力上限 +120，物理攻擊 +15！', materials: [{ id: 'alloy', name: '合金板材', qty: 8 }, { id: 'chip', name: '高階晶片', qty: 3 }, { id: 'circuit', name: '電子元件', qty: 6 }, { id: 'screw', name: '螺絲零件', qty: 12 }], output: { id: 'armor_t5', cat: 'tool', qty: 1 } },
+            { id: 'r_alloy', name: '⚙️ [中間材料] 合金板材', desc: '製造高階 T4/T5 盔甲核心材料', materials: [{ id: 'iron', name: '精鍛鐵塊', qty: 3 }, { id: 'circuit', name: '電子元件', qty: 2 }], output: { id: 'alloy', cat: 'tool', qty: 1 } },
+            { id: 'r_chip', name: '💾 [中間材料] 高階晶片', desc: '動力外骨骼與高科技裝備組件', materials: [{ id: 'circuit', name: '電子元件', qty: 4 }, { id: 'screw', name: '螺絲零件', qty: 4 }], output: { id: 'chip', cat: 'tool', qty: 1 } },
+            { id: 'r_iron_sword', name: '⚔️ 精鍛鐵劍', desc: '物理攻擊 +10', materials: [{ id: 'iron', name: '精鍛鐵塊', qty: 4 }, { id: 'wood', name: '原木材', qty: 2 }], output: { id: 'iron_sword', cat: 'tool', qty: 1 } },
+            { id: 'r_herb_salve', name: '💊 自製草藥膏', desc: '減輕傷勢 -15', materials: [{ id: 'herb', name: '野生草藥', qty: 2 }, { id: 'water', name: '純淨水', qty: 1 }], output: { id: 'herb_salve', cat: 'medical', qty: 1 } },
+            { id: 'r_medkit', name: '🏥 軍用急救箱', desc: '傷勢清零，體力+30', materials: [{ id: 'bandage', name: '醫用紗布', qty: 2 }, { id: 'herb', name: '野生草藥', qty: 2 }], output: { id: 'medkit', cat: 'medical', qty: 1 } },
+            { id: 'r_bomb', name: '💣 簡易手雷', desc: '戰鬥消耗品，造成 90 點炸裂傷害', materials: [{ id: 'circuit', name: '電子元件', qty: 1 }, { id: 'screw', name: '螺絲零件', qty: 3 }], output: { id: 'bomb', cat: 'tool', qty: 1 } }
         ];
 
         const SHOP_ITEMS = [
-            { id: 'water', name: '純淨水', price: 60, desc: '水分 +30', qty: 1, cat: 'food' },
-            { id: 'biscuit', name: '壓縮餅乾', price: 70, desc: '飽食度 +25', qty: 1, cat: 'food' },
-            { id: 'canned', name: '高能肉類罐頭', price: 140, desc: '飽食度 +40', qty: 1, cat: 'food' },
-            { id: 'bandage', name: '醫用紗布', price: 100, desc: '減輕傷勢 -20', qty: 1, cat: 'medical' },
-            { id: 'wood', name: '原木材包', price: 80, desc: 'MC基礎合成材料 x3', qty: 3, cat: 'tool' },
-            { id: 'iron', name: '精鍛鐵塊', price: 120, desc: '鍛造金屬材料', qty: 1, cat: 'tool' },
-            { id: 'circuit', name: '電子元件', price: 160, desc: '組裝芯片/合金材料', qty: 1, cat: 'tool' }
+            { id: 'water', price: 60, qty: 1, cat: 'food' },
+            { id: 'biscuit', price: 70, qty: 1, cat: 'food' },
+            { id: 'canned', price: 140, qty: 1, cat: 'food' },
+            { id: 'bandage', price: 100, qty: 1, cat: 'medical' },
+            { id: 'wood', price: 80, qty: 3, cat: 'tool' },
+            { id: 'iron', price: 120, qty: 1, cat: 'tool' },
+            { id: 'circuit', price: 160, qty: 1, cat: 'tool' }
         ];
 
         const STRANGE_ITEMS = [
-            { id: 'dirty_duck', name: '橡膠小黃鴨', cat: 'tool', effect: '按壓發出嘎嘎聲，心情 +20', desc: '末日裡的解壓玩具。' },
-            { id: 'strange_mushroom', name: '發光奇異蘑菇', cat: 'tool', effect: '解毒生津，心情 +15', desc: '散發微弱藍光。' },
-            { id: 'gameboy', name: '破舊掌上遊戲機', cat: 'tool', effect: '打一把遊戲，心情 +30', desc: '居然還有電！' },
-            { id: 'gold_watch', name: '鍍金懷錶', cat: 'tool', effect: '可直接兌換 500 金幣', desc: '舊時代精美懷錶。' }
+            { id: 'dirty_duck', cat: 'tool' },
+            { id: 'strange_mushroom', cat: 'tool' },
+            { id: 'gameboy', cat: 'tool' },
+            { id: 'gold_watch', cat: 'tool' }
         ];
 
         /* ================= 20+ RADIO GOOD & BAD EVENTS ================= */
@@ -616,19 +1210,19 @@
             { title: "📻 救援隊廣播信號", text: "攔截到政府空中搜救頻率，獲得全城物資坐標標註！", type: "good", effect: () => { gameState.currencies.gold += 200; gainXp(40); return "獲得 200 金幣 & 40 XP！"; } },
             { title: "📻 詐騙陷阱頻率", text: "聽信了偽造的救助信號，跟隨引導丟失了部分財物！", type: "bad", effect: () => { gameState.currencies.gold = Math.max(0, gameState.currencies.gold - 100); return "損失了 100 金幣！"; } },
             { title: "📻 劫匪信號追蹤", text: "你的電台發射訊號被掠奪者追蹤，庇護所防線受到滋擾！", type: "bad", effect: () => { adjustStats(0, 0, -10); gameState.shelter.durability = Math.max(0, gameState.shelter.durability - 5); return "體力 -10，庇護所耐久 -5！"; } },
-            { title: "📻 倖存者物資互換", text: "與隔壁街區的避難者完成無線電物資交接！", type: "good", effect: () => { addItemToInventory('wood', '原木材', 'tool', 3, 'MC基礎材料'); return "獲得原木材 x3！"; } },
+            { title: "📻 倖存者物資互換", text: "與隔壁街區的避難者完成無線電物資交接！", type: "good", effect: () => { addItemToInventory('wood', 'tool', 3); return "獲得原木材 x3！"; } },
             { title: "📻 寒潮臨近警報", text: "收聽到了氣象台的最後殘留播報，提前做好了防寒加固！", type: "good", effect: () => { gameState.player.sanity = Math.min(100, gameState.player.sanity + 15); return "精神值 +15！"; } },
             { title: "📻 神秘黑客入侵", text: "電台自動接收到了加密數據包，解析出暗網加密貨幣！", type: "good", effect: () => { gameState.currencies.diamond += 3; return "鑽石 +3！"; } },
             { title: "📻 強烈雜音干擾", text: "突如其來的刺耳尖銳噪音撕裂了電台喇叭！", type: "bad", effect: () => { adjustStats(0, 0, 0, -15); gameState.player.sanity = Math.max(0, gameState.player.sanity - 10); return "心情 -15，精神 -10！"; } },
-            { title: "📻 野外醫師求助", text: "回應了一位流浪醫師的求助諮詢，獲得了草藥配方指引！", type: "good", effect: () => { addItemToInventory('herb', '野生草藥', 'tool', 2, '藥劑製作材料'); return "獲得野生草藥 x2！"; } },
+            { title: "📻 野外醫師求助", text: "回應了一位流浪醫師的求助諮詢，獲得了草藥配方指引！", type: "good", effect: () => { addItemToInventory('herb', 'tool', 2); return "獲得野生草藥 x2！"; } },
             { title: "📻 軍用密碼廣播", text: "錄下一段重複播放的數字代號，成功解鎖真相線索！", type: "good", effect: () => { if (!gameState.clues.some(c=>c.id==='c_radio_code')) gameState.clues.push({id:'c_radio_code', title:'軍用頻率代號', desc:'解密出城市中心地下掩體的緊急密碼。'}); return "解鎖新線索【軍用頻率代號】！"; } },
             { title: "📻 大合唱精神慰藉", text: "幾十個避難者在同一個頻道合唱舊時代歌曲，內心得到洗禮！", type: "good", effect: () => { gameState.player.sanity = 100; adjustStats(0, 0, 0, +25); return "精神值補滿！心情 +25！"; } },
             { title: "📻 恐怖嘶吼傳訊", text: "頻道中傳來變異巨獸撕咬人類的慘烈哀號……", type: "bad", effect: () => { gameState.player.sanity = Math.max(0, gameState.player.sanity - 20); return "精神值 -20！"; } },
-            { title: "📻 流浪商人拍播", text: "參與了電台空中物資拍賣，花費少許金幣討到好物！", type: "good", effect: () => { if(gameState.currencies.gold>=80){ gameState.currencies.gold-=80; addItemToInventory('iron', '精鍛鐵塊', 'tool', 2, 'MC鍛造材料'); return "花費80金幣，獲得精鍛鐵塊 x2！"; } return "金幣不足，錯過了拍賣。"; } },
-            { title: "📻 拾荒者路線共享", text: "幸存者分享了一條安全的工廠搜刮路線。", type: "good", effect: () => { addItemToInventory('screw', '螺絲零件', 'tool', 3, '合成材料'); return "獲得螺絲零件 x3！"; } },
+            { title: "📻 流浪商人拍播", text: "參與了電台空中物資拍賣，花費少許金幣討到好物！", type: "good", effect: () => { if(gameState.currencies.gold>=80){ gameState.currencies.gold-=80; addItemToInventory('iron', 'tool', 2); return "花費80金幣，獲得精鍛鐵塊 x2！"; } return "金幣不足，錯過了拍賣。"; } },
+            { title: "📻 拾荒者路線共享", text: "幸存者分享了一條安全的工廠搜刮路線。", type: "good", effect: () => { addItemToInventory('screw', 'tool', 3); return "獲得螺絲零件 x3！"; } },
             { title: "📻 靜電電磁脈衝", text: "天空中一道強雷擊中避難所天線，天線被燒毀！", type: "bad", effect: () => { adjustStats(0, 0, -15); return "受到電擊驚嚇，體力 -15！"; } },
-            { title: "📻 遇險者求救聲", text: "你口頭指導對方包紮傷口，對方遙贈物資致謝！", type: "good", effect: () => { addItemToInventory('bandage', '醫用紗布', 'medical', 1, '傷勢 -20'); return "獲得醫用紗布 x1！"; } },
-            { title: "📻 空投補給物資訊號", text: "獲得救援隊精確空投坐標，撿到珍貴食品！", type: "good", effect: () => { addItemToInventory('canned', '高能肉類罐頭', 'food', 2, '飽食度 +40'); return "獲得高能肉類罐頭 x2！"; } },
+            { title: "📻 遇險者求救聲", text: "你口頭指導對方包紮傷口，對方遙贈物資致謝！", type: "good", effect: () => { addItemToInventory('bandage', 'medical', 1); return "獲得醫用紗布 x1！"; } },
+            { title: "📻 空投補給物資訊號", text: "獲得救援隊精確空投坐標，撿到珍貴食品！", type: "good", effect: () => { addItemToInventory('canned', 'food', 2); return "獲得高能肉類罐頭 x2！"; } },
             { title: "📻 假軍官誘捕通告", text: "差點掉入偽裝成軍方的陷阱，耗費體力脫險！", type: "bad", effect: () => { adjustStats(0, 0, -20); return "體力 -20！"; } },
             { title: "📻 武器大師講座", text: "收聽老老兵講解步槍拆卸與近戰刺殺技巧！", type: "good", effect: () => { gameState.player.str += 1; recalculatePlayerStats(); return "力量 (STR) +1，攻擊力提升！"; } },
             { title: "📻 舊世界經典音樂", text: "悠揚的爵士樂在寂靜的深夜裡迴盪……", type: "good", effect: () => { adjustStats(0, 0, 0, +20); return "心情值 +20！"; } },
@@ -638,30 +1232,30 @@
         /* ================= 20+ RANDOM EVENTS ================= */
         const RANDOM_EVENTS = [
             { id: 1, title: "🎲 [隨機事件] 廢棄自動售貨機", desc: "走廊角落有一台玻璃破裂的售貨機，裡面卡著飲料和金幣。", options: [
-                { text: "🔨 用工具撬開（耗體力15，得純淨水x2）", action: () => { adjustStats(0, 0, -15); addItemToInventory('water', '純淨水', 'food', 2, '水分 +30'); showEventResult("成功撬開售貨機，獲得 2 瓶純淨水！"); } },
+                { text: "🔨 用工具撬開（耗體力15，得純淨水x2）", action: () => { adjustStats(0, 0, -15); addItemToInventory('water', 'food', 2); showEventResult("成功撬開售貨機，獲得 2 瓶純淨水！"); } },
                 { text: "🔍 摸索投幣口（獲得 150 金幣）", action: () => { gameState.currencies.gold += 150; showEventResult("摸出了 150 金幣！"); } }
             ]},
             { id: 2, title: "🎲 [隨機事件] 倒下的快遞貨車", desc: "門口停著一輛翻倒的快遞貨車，包裹散落一地。", options: [
-                { text: "🎒 冒險搜刮（獲得壓縮餅乾x2，體力-10）", action: () => { adjustStats(0, 0, -10); addItemToInventory('biscuit', '壓縮餅乾', 'food', 2, '飽食度 +25'); showEventResult("抱走兩個食品包裹！"); } }
+                { text: "🎒 冒險搜刮（獲得壓縮餅乾x2，體力-10）", action: () => { adjustStats(0, 0, -10); addItemToInventory('biscuit', 'food', 2); showEventResult("抱走兩個食品包裹！"); } }
             ]},
             { id: 3, title: "🎲 [隨機事件] 坍塌的廢棄藥店", desc: "藥店玻璃碎裂一地，櫃檯後似乎有防腐藥品盒。", options: [
-                { text: "💊 翻找藥劑櫃（獲得醫用紗布x2）", action: () => { addItemToInventory('bandage', '醫用紗布', 'medical', 2, '傷勢 -20'); showEventResult("找到了 2 包醫用紗布！"); } }
+                { text: "💊 翻找藥劑櫃（獲得醫用紗布x2）", action: () => { addItemToInventory('bandage', 'medical', 2); showEventResult("找到了 2 包醫用紗布！"); } }
             ]},
             { id: 4, title: "🎲 [隨機事件] 路障劫匪的埋伏", desc: "前方的廢墟巷口跳出兩個手持鐵棍的掠奪者！", options: [
-                { text: "⚔️ 正面硬剛（耗體力20，獲得鐵塊x2）", action: () => { adjustStats(0, 0, -20); addItemToInventory('iron', '精鍛鐵塊', 'tool', 2, 'MC鍛造材料'); showEventResult("打跑了劫匪，繳獲精鍛鐵塊 x2！"); } },
+                { text: "⚔️ 正面硬剛（耗體力20，獲得鐵塊x2）", action: () => { adjustStats(0, 0, -20); addItemToInventory('iron', 'tool', 2); showEventResult("打跑了劫匪，繳獲精鍛鐵塊 x2！"); } },
                 { text: "🏃 迅速繞路（耗時間30分鐘）", action: () => { advanceTime(30); showEventResult("安全繞開了劫匪埋伏區。"); } }
             ]},
             { id: 5, title: "🎲 [隨機事件] 枯萎的私人溫室", desc: "頂樓溫室花園裡散落著未枯萎的草藥植物。", options: [
-                { text: "🌿 採摘野生草藥（獲得野生草藥x3）", action: () => { addItemToInventory('herb', '野生草藥', 'tool', 3, '藥劑材料'); showEventResult("采摘獲得野生草藥 x3！"); } }
+                { text: "🌿 採摘野生草藥（獲得野生草藥x3）", action: () => { addItemToInventory('herb', 'tool', 3); showEventResult("采摘獲得野生草藥 x3！"); } }
             ]},
             { id: 6, title: "🎲 [隨機事件] 神秘防空洞入口", desc: "生鏽的鐵門微微敞開，裡面傳來冷風。", options: [
                 { text: "🔦 進入探索（耗體力15，得鑽石x2，金幣x200）", action: () => { adjustStats(0, 0, -15); gameState.currencies.diamond += 2; gameState.currencies.gold += 200; showEventResult("在防空洞軍械箱找到 2 鑽石與 200 金幣！"); } }
             ]},
             { id: 7, title: "🎲 [隨機事件] 遺棄的軍用吉普車", desc: "吉普車引擎蓋冒著煙，後備箱未鎖上。", options: [
-                { text: "🔧 拆卸電子元件（獲得電子元件x2）", action: () => { addItemToInventory('circuit', '電子元件', 'tool', 2, '高科技材料'); showEventResult("拆下了 2 個電子元件！"); } }
+                { text: "🔧 拆卸電子元件（獲得電子元件x2）", action: () => { addItemToInventory('circuit', 'tool', 2); showEventResult("拆下了 2 個電子元件！"); } }
             ]},
             { id: 8, title: "🎲 [隨機事件] 冒煙的變壓器箱", desc: "路邊的變壓器箱散發著火花。", options: [
-                { text: "⚡ 冒險剪斷電線（耗體力10，獲得螺絲x4）", action: () => { adjustStats(0, 0, -10); addItemToInventory('screw', '螺絲零件', 'tool', 4, '合成材料'); showEventResult("收集了螺絲零件 x4！"); } }
+                { text: "⚡ 冒險剪斷電線（耗體力10，獲得螺絲x4）", action: () => { adjustStats(0, 0, -10); addItemToInventory('screw', 'tool', 4); showEventResult("收集了螺絲零件 x4！"); } }
             ]},
             { id: 9, title: "🎲 [隨機事件] 被鎖住的地下室", desc: "一把厚重的鐵鎖封住了居民樓地下室。", options: [
                 { text: "🔐 嘗試破解密碼鎖", action: () => { triggerMinigame('lockpick'); } }
@@ -670,31 +1264,31 @@
                 { text: "🍖 餵食壓縮餅乾（耗餅乾x1，心情+20）", action: () => { removeItemFromInventory('biscuit', 1); adjustStats(0, 0, 0, +20); showEventResult("流浪犬高興地搖尾巴，你的心情大幅提升！"); } }
             ]},
             { id: 11, title: "🎲 [隨機事件] 廢棄警察局槍械庫", desc: "槍械庫大門已被破壞，地上留有強韌布料與皮革。", options: [
-                { text: "🛡️ 搜刮護具材料（獲得皮革x3，布料x3）", action: () => { addItemToInventory('leather', '變異皮革', 'tool', 3, '防具材料'); addItemToInventory('cloth', '強韌布料', 'tool', 3, '防具材料'); showEventResult("找到了變異皮革x3 與 布料x3！"); } }
+                { text: "🛡️ 搜刮護具材料（獲得皮革x3，布料x3）", action: () => { addItemToInventory('leather', 'tool', 3); addItemToInventory('cloth', 'tool', 3); showEventResult("找到了變異皮革x3 與 布料x3！"); } }
             ]},
             { id: 12, title: "🎲 [隨機事件] 翻倒的救護車", desc: "路中央停著一輛被遺棄的救護車。", options: [
-                { text: "🚑 搜尋醫療物資（獲得軍用急救箱x1）", action: () => { addItemToInventory('medkit', '軍用急救箱', 'medical', 1, '傷勢清零'); showEventResult("幸運地找到了 1 個軍用急救箱！"); } }
+                { text: "🚑 搜尋醫療物資（獲得軍用急救箱x1）", action: () => { addItemToInventory('medkit', 'medical', 1); showEventResult("幸運地找到了 1 個軍用急救箱！"); } }
             ]},
             { id: 13, title: "🎲 [隨機事件] 坍塌的超商貨架", desc: "貨架下方壓著幾箱封閉的密封食品。", options: [
-                { text: "💪 搬開水泥板（耗體力20，得罐頭x2）", action: () => { adjustStats(0, 0, -20); addItemToInventory('canned', '高能肉類罐頭', 'food', 2, '飽食+40'); showEventResult("搬開雜物，搬出 2 盒肉類罐頭！"); } }
+                { text: "💪 搬開水泥板（耗體力20，得罐頭x2）", action: () => { adjustStats(0, 0, -20); addItemToInventory('canned', 'food', 2); showEventResult("搬開雜物，搬出 2 盒肉類罐頭！"); } }
             ]},
             { id: 14, title: "🎲 [隨機事件] 水溝裡的密封防水箱", desc: "污水溝中漂浮著一個黑色防水箱。", options: [
-                { text: "🎣 打撈箱子（獲得精鍛鐵塊x3，電子元件x2）", action: () => { addItemToInventory('iron', '精鍛鐵塊', 'tool', 3, '防具材料'); addItemToInventory('circuit', '電子元件', 'tool', 2, '高科技材料'); showEventResult("打撈上岸，獲得精鍛鐵塊x3 與 電子元件x2！"); } }
+                { text: "🎣 打撈箱子（獲得精鍛鐵塊x3，電子元件x2）", action: () => { addItemToInventory('iron', 'tool', 3); addItemToInventory('circuit', 'tool', 2); showEventResult("打撈上岸，獲得精鍛鐵塊x3 與 電子元件x2！"); } }
             ]},
             { id: 15, title: "🎲 [隨機事件] 燃燒的未熄滅篝火", desc: "似乎有其他拾荒者剛剛離開這裡。", options: [
                 { text: "🔥 在篝火旁取暖（體力+20，心情+10）", action: () => { adjustStats(0, 0, +20, +10); showEventResult("驅散了身上的寒意，體力與心情提升！"); } }
             ]},
             { id: 16, title: "🎲 [隨機事件] 廢棄電子廠車間", desc: "精密儀器散落一地。", options: [
-                { text: "🔍 仔細拆解電路板（獲得電子元件x3）", action: () => { addItemToInventory('circuit', '電子元件', 'tool', 3, '高科技材料'); showEventResult("獲得電子元件 x3！"); } }
+                { text: "🔍 仔細拆解電路板（獲得電子元件x3）", action: () => { addItemToInventory('circuit', 'tool', 3); showEventResult("獲得電子元件 x3！"); } }
             ]},
             { id: 17, title: "🎲 [隨機事件] 坍塌木屋廢墟", desc: "大量優質木材堆積在廢墟中。", options: [
-                { text: "🪵 砍伐劈柴（獲得原木材x6）", action: () => { addItemToInventory('wood', '原木材', 'tool', 6, 'MC基礎材料'); showEventResult("收集到了原木材 x6！"); } }
+                { text: "🪵 砍伐劈柴（獲得原木材x6）", action: () => { addItemToInventory('wood', 'tool', 6); showEventResult("收集到了原木材 x6！"); } }
             ]},
             { id: 18, title: "🎲 [隨機事件] 破裂的加油機", desc: "加油站地面散落著漏出的燃油與金屬管線。", options: [
-                { text: "🛠️ 拆卸金屬管（獲得精鍛鐵塊x2）", action: () => { addItemToInventory('iron', '精鍛鐵塊', 'tool', 2, 'MC鍛造材料'); showEventResult("拆下優質金屬管，獲得精鍛鐵塊 x2！"); } }
+                { text: "🛠️ 拆卸金屬管（獲得精鍛鐵塊x2）", action: () => { addItemToInventory('iron', 'tool', 2); showEventResult("拆下優質金屬管，獲得精鍛鐵塊 x2！"); } }
             ]},
             { id: 19, title: "🎲 [隨機事件] 防空洞警衛室", desc: "值班室抽屜裡放著舊時代的收藏寶物。", options: [
-                { text: "👑 拿走懷錶（獲得鍍金懷錶x1）", action: () => { addItemToInventory('gold_watch', '鍍金懷錶', 'tool', 1, '可兌換500金幣'); showEventResult("獲得了精美的鍍金懷錶！"); } }
+                { text: "👑 拿走懷錶（獲得鍍金懷錶x1）", action: () => { addItemToInventory('gold_watch', 'tool', 1); showEventResult("獲得了精美的鍍金懷錶！"); } }
             ]},
             { id: 20, title: "🎲 [隨機事件] 遺落的真皮公文包", desc: "路邊丟棄著一個密碼公文包。", options: [
                 { text: "💼 暴力砸開（耗體力10，獲得 300 金幣）", action: () => { adjustStats(0, 0, -10); gameState.currencies.gold += 300; showEventResult("砸開公文包，獲得 300 現金金幣！"); } }
@@ -709,13 +1303,16 @@
             const text = "好……你好……歡迎進入《末日三十天》極限生存系統……~";
             let idx = 0;
             const elem = document.getElementById('stutter-text');
-            elem.innerHTML = "";
-            const interval = setInterval(() => {
-                elem.innerHTML += text[idx];
-                idx++;
-                if (idx >= text.length) clearInterval(interval);
-            }, 40);
+            if (elem) {
+                elem.innerHTML = "";
+                const interval = setInterval(() => {
+                    elem.innerHTML += text[idx];
+                    idx++;
+                    if (idx >= text.length) clearInterval(interval);
+                }, 40);
+            }
 
+            switchLanguage('zh-TW');
             recalculatePlayerStats();
             renderLeftInventory();
             updateRightStatusPanel();
@@ -731,11 +1328,11 @@
         /* ================= RPG CALCULATIONS & 5-TIER ARMOR SYSTEM ================= */
         function getHighestEquippedArmor() {
             const armors = [
-                { id: 'armor_t5', name: '終極動力外骨骼', def: 60, stamina: 120, atk: 15 },
-                { id: 'armor_t4', name: '戰術合金複合甲', def: 38, stamina: 70, atk: 0 },
-                { id: 'armor_t3', name: '重型精鍛鐵甲', def: 22, stamina: 45, atk: 0 },
-                { id: 'armor_t2', name: '熟皮硬甲', def: 12, stamina: 25, atk: 0 },
-                { id: 'armor_t1', name: '破舊布衣', def: 5, stamina: 10, atk: 0 }
+                { id: 'armor_t5', def: 60, stamina: 120, atk: 15 },
+                { id: 'armor_t4', def: 38, stamina: 70, atk: 0 },
+                { id: 'armor_t3', def: 22, stamina: 45, atk: 0 },
+                { id: 'armor_t2', def: 12, stamina: 25, atk: 0 },
+                { id: 'armor_t1', def: 5, stamina: 10, atk: 0 }
             ];
 
             for (let a of armors) {
@@ -760,7 +1357,12 @@
 
             const armorTagElem = document.getElementById('equipped-armor-tag');
             if (armorTagElem) {
-                armorTagElem.innerText = bestArmor ? `${bestArmor.name} (防禦+${bestArmor.def})` : '無防具 (防禦+0)';
+                if (bestArmor) {
+                    const armorName = getItemTranslation(bestArmor.id, 'name');
+                    armorTagElem.innerText = `${armorName} (DEF+${bestArmor.def})`;
+                } else {
+                    armorTagElem.innerText = I18N[currentLang].noArmor;
+                }
             }
 
             updateRightStatusPanel();
@@ -784,7 +1386,7 @@
             if (leveledUp) {
                 p.stamina = p.maxStamina;
                 p.sanity = Math.min(100, p.sanity + 25);
-                alert(`🎉 恭喜升級！當前等級：Lv.${p.level}！獲得 3 點自由屬性點！`);
+                alert(`🎉 ${I18N[currentLang].level}! Lv.${p.level}! (+3 Stat Pts)`);
             }
             updateRightStatusPanel();
         }
@@ -800,62 +1402,54 @@
             openPanel('level');
         }
 
-        /* ================= BLACK MARKET BLINDBOX (FUN GAMBLE) ================= */
+        /* ================= BLACK MARKET BLINDBOX ================= */
         function buyGambleBox() {
-            if (gameState.currencies.gold < 100) { alert("金幣不足 100！無法購買黑市物資盲盒。"); return; }
+            if (gameState.currencies.gold < 100) { alert(currentLang === 'en' ? "Insufficient Gold!" : "金幣不足 100！"); return; }
             gameState.currencies.gold -= 100;
 
             const possibleRewards = [
-                { name: '精鍛鐵塊 x3', action: () => addItemToInventory('iron', '精鍛鐵塊', 'tool', 3, 'MC鍛造材料') },
-                { name: '合金板材 x1 (稀有！)', action: () => addItemToInventory('alloy', '合金板材', 'tool', 1, '高階防具材料') },
-                { name: '高階晶片 x1 (極稀有！)', action: () => addItemToInventory('chip', '高階晶片', 'tool', 1, '高科技材料') },
-                { name: '變異皮革 x4', action: () => addItemToInventory('leather', '變異皮革', 'tool', 4, '防具材料') },
-                { name: '高能肉類罐頭 x2', action: () => addItemToInventory('canned', '高能肉類罐頭', 'food', 2, '飽食+40') },
-                { name: '破爛生鏽鐵釘 (垃圾)', action: () => addItemToInventory('screw', '螺絲零件', 'tool', 1, '材料') }
+                { id: 'iron', qty: 3 },
+                { id: 'alloy', qty: 1 },
+                { id: 'chip', qty: 1 },
+                { id: 'leather', qty: 4 },
+                { id: 'canned', qty: 2 },
+                { id: 'screw', qty: 1 }
             ];
 
             const reward = possibleRewards[Math.floor(Math.random() * possibleRewards.length)];
-            reward.action();
-            alert(`🎰 拆開黑市物資盲盒！獲得：【${reward.name}】！`);
+            addItemToInventory(reward.id, (reward.id === 'canned' ? 'food' : 'tool'), reward.qty);
+            const itemName = getItemTranslation(reward.id, 'name');
+            alert(`🎰 Mystery Box: ${itemName} x${reward.qty}!`);
             updateRightStatusPanel();
         }
 
-        /* ================= SCAVENGE SUPPLIES (MC MATERIAL DROPS) ================= */
+        /* ================= SCAVENGE SUPPLIES ================= */
         function scavengeSupplies() {
             let timeOk = advanceTime(60);
             if (!timeOk) return;
 
             adjustStats(-10, -12, -15);
             
-            // Randomly drop MC style materials
             const mats = ['wood', 'iron', 'cloth', 'leather', 'herb', 'screw', 'circuit'];
             const randomMatId = mats[Math.floor(Math.random() * mats.length)];
-            const matNames = { wood: '原木材', iron: '精鍛鐵塊', cloth: '強韌布料', leather: '變異皮革', herb: '野生草藥', screw: '螺絲零件', circuit: '電子元件' };
             
-            addItemToInventory(randomMatId, matNames[randomMatId], 'tool', 2, '合成材料');
+            addItemToInventory(randomMatId, 'tool', 2);
+            const matName = getItemTranslation(randomMatId, 'name');
             
-            let logMsg = `你冒險前往廢墟建築搜刮，成功找到了 <b>2 個 ${matNames[randomMatId]}</b>！`;
+            let logMsg = `搜刮獲得 <b>2 x ${matName}</b>！`;
 
             if (Math.random() < 0.35) {
                 const strange = STRANGE_ITEMS[Math.floor(Math.random() * STRANGE_ITEMS.length)];
-                addItemToInventory(strange.id, strange.name, strange.cat, 1, strange.effect);
-                logMsg += `<br><span class="text-amber-400 font-bold">✨ [驚喜收穫！]</span> 你在搜刮途中發現了奇特寶物：<b>【${strange.name}】</b>！（${strange.desc}）`;
+                addItemToInventory(strange.id, strange.cat, 1);
+                const sName = getItemTranslation(strange.id, 'name');
+                logMsg += `<br><span class="text-amber-400 font-bold">✨ [Treasure!]</span> 獲得 <b>【${sName}】</b>！`;
             }
 
             const hourStr = `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`;
-            renderStoryNode(gameState.time.day, `第${gameState.time.day}天：搜刮歸來`, hourStr, logMsg, [
-                { text: `⚔️ [闖關打怪] 挑戰第 ${gameState.dungeonStage} 關怪物`, action: () => startMonsterBattle() },
-                { text: "🧱 [保守] 固守房門，加固庇護所", action: () => advanceStory(30, -3, -3, +10, "你加固了房門，庇護所防禦穩定。") },
-                { text: "😴 [休息] 閉目休息 4 小時補充精力", action: () => sleepOrRest('rest4') },
-                { text: "🌙 [睡眠] 一鍵睡覺至次日 08:00", action: () => sleepOrRest('sleepNight') },
-                { text: "🔍 [搜尋] 外出搜尋物資 (獲得材料與奇特寶物)", action: () => scavengeSupplies() },
-                { text: "📻 [電台] 電台通訊其他避難者 (解鎖好壞事件與交易)", action: () => radioCommunication() },
-                { text: "🔨 [工作台] 打開工作台合成5級防禦盔甲", action: () => openPanel('workbench') },
-                { text: "🛒 [商城] 打開商城購買食品與水", action: () => openPanel('shop') }
-            ]);
+            renderDefaultOptions(logMsg, hourStr);
         }
 
-        /* ================= 20+ RADIO COMMUNICATION SYSTEM ================= */
+        /* ================= RADIO COMMUNICATION ================= */
         function radioCommunication() {
             let timeOk = advanceTime(30);
             if (!timeOk) return;
@@ -865,24 +1459,29 @@
             const evt = RADIO_EVENTS[Math.floor(Math.random() * RADIO_EVENTS.length)];
             const effectResultText = evt.effect();
 
-            let typeBadge = evt.type === 'good' ? '<span class="text-emerald-400 font-bold">[幸運收益事件]</span>' : '<span class="text-rose-500 font-bold">[危險負面事件]</span>';
-
-            let logMsg = `<b>${evt.title}</b> ${typeBadge}<br>${evt.text}<br><span class="text-amber-400 font-bold mt-1 inline-block">【事件結果】${effectResultText}</span>`;
+            let typeBadge = evt.type === 'good' ? '<span class="text-emerald-400 font-bold">[Good Event]</span>' : '<span class="text-rose-500 font-bold">[Bad Event]</span>';
+            let logMsg = `<b>${evt.title}</b> ${typeBadge}<br>${evt.text}<br><span class="text-amber-400 font-bold mt-1 inline-block">${effectResultText}</span>`;
             
             const hourStr = `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`;
-            renderStoryNode(gameState.time.day, `第${gameState.time.day}天：電台對講`, hourStr, logMsg, [
-                { text: `⚔️ [闖關打怪] 挑戰第 ${gameState.dungeonStage} 關怪物`, action: () => startMonsterBattle() },
-                { text: "🧱 [保守] 固守房門，加固庇護所", action: () => advanceStory(30, -3, -3, +10, "你加固了房門，庇護所防禦穩定。") },
-                { text: "😴 [休息] 閉目休息 4 小時補充精力", action: () => sleepOrRest('rest4') },
-                { text: "🌙 [睡眠] 一鍵睡覺至次日 08:00", action: () => sleepOrRest('sleepNight') },
-                { text: "🔍 [搜尋] 外出搜尋物資 (獲得材料與奇特寶物)", action: () => scavengeSupplies() },
-                { text: "📻 [電台] 電台通訊其他避難者 (解鎖好壞事件與交易)", action: () => radioCommunication() },
-                { text: "🔨 [工作台] 打開工作台合成5級防禦盔甲", action: () => openPanel('workbench') },
-                { text: "🛒 [商城] 打開商城購買食品與水", action: () => openPanel('shop') }
+            renderDefaultOptions(logMsg, hourStr);
+        }
+
+        function renderDefaultOptions(logMsg, hourStr) {
+            const dict = I18N[currentLang];
+            const battleText = dict.actBattle.replace('{stg}', gameState.dungeonStage);
+            renderStoryNode(gameState.time.day, `${dict.dayUnit || 'Day'} ${gameState.time.day}`, hourStr, logMsg, [
+                { text: battleText, action: () => startMonsterBattle() },
+                { text: dict.actDefend, action: () => advanceStory(30, -3, -3, +10, currentLang === 'en' ? "Shelter defense fortified." : "你加固了房門，庇護所防禦穩定。") },
+                { text: dict.actRest4, action: () => sleepOrRest('rest4') },
+                { text: dict.actSleep, action: () => sleepOrRest('sleepNight') },
+                { text: dict.actScavenge, action: () => scavengeSupplies() },
+                { text: dict.actRadio, action: () => radioCommunication() },
+                { text: dict.actWorkbench, action: () => openPanel('workbench') },
+                { text: dict.actShop, action: () => openPanel('shop') }
             ]);
         }
 
-        /* ================= RPG DUNGEON COMBAT & BOSS DROPS ================= */
+        /* ================= RPG DUNGEON COMBAT ================= */
         function startMonsterBattle() {
             const stg = gameState.dungeonStage;
             let mName = "";
@@ -890,14 +1489,11 @@
             let isMainBoss = (stg % 10 === 0);
 
             if (isMainBoss) {
-                const bossNames = ["👹 滅世泰坦 (大BOSS)", "👹 終極感染源 (大BOSS)", "👹 毀滅鋼鐵巨獸 (大BOSS)"];
-                mName = bossNames[(stg / 10 - 1) % bossNames.length] || `👹 關卡 ${stg} 大BOSS`;
+                mName = `👹 Stage ${stg} BOSS`;
             } else if (isMiniBoss) {
-                const miniNames = ["🐾 狂暴狼王 (小BOSS)", "🐾 劇毒蛛後 (小BOSS)", "🐾 變異突擊者 (小BOSS)"];
-                mName = miniNames[(stg / 5 - 1) % miniNames.length] || `🐾 關卡 ${stg} 小BOSS`;
+                mName = `🐾 Stage ${stg} Mini-BOSS`;
             } else {
-                const normNames = ["變異野狗", "游蕩失序者", "巨型變異蛛", "廢墟掠奪者", "基因變異體", "鋼鐵傀儡"];
-                mName = normNames[(stg - 1) % normNames.length];
+                mName = `Monster #${stg}`;
             }
 
             let multiplier = 1 + (stg - 1) * 0.25;
@@ -916,7 +1512,7 @@
                 isMainBoss,
                 monster: { name: mName, hp: baseHp, maxHp: baseHp, atk: baseAtk, def: baseDef, xpReward, goldReward },
                 turn: 1,
-                logs: [`進入【第 ${stg} 關】！遭遇了【${mName}】！`]
+                logs: [`Stage ${stg}: Encountered ${mName}!`]
             };
             renderCombatView();
         }
@@ -924,22 +1520,23 @@
         function renderCombatView() {
             const m = currentCombat.monster;
             const p = gameState.player;
+            const dict = I18N[currentLang];
 
             document.getElementById('sec-main-game').classList.remove('hidden');
-            document.getElementById('main-chapter-title').innerHTML = `⚔️ 闖關模式第 ${currentCombat.stage} 關 (回合 ${currentCombat.turn})`;
+            document.getElementById('main-chapter-title').innerHTML = `⚔️ ${dict.stage} ${currentCombat.stage} (${dict.combatTurn} ${currentCombat.turn})`;
             
             let combatHtml = `
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-2 text-center text-xs">
                         <div class="p-3 bg-emerald-950/60 border border-emerald-500/50 rounded-lg">
                             <div class="font-bold text-emerald-400">${p.name} (Lv.${p.level})</div>
-                            <div class="text-[11px] text-zinc-300 mt-1">體力/生命: ${p.stamina}/${p.maxStamina}</div>
-                            <div class="text-[11px] text-zinc-400">攻擊: ${p.atk} | 防禦: ${p.def}</div>
+                            <div class="text-[11px] text-zinc-300 mt-1">${dict.hp}: ${p.stamina}/${p.maxStamina}</div>
+                            <div class="text-[11px] text-zinc-400">${dict.atk} ${p.atk} | ${dict.def} ${p.def}</div>
                         </div>
                         <div class="p-3 bg-rose-950/60 border border-rose-500/50 rounded-lg">
                             <div class="font-bold text-rose-400">${m.name}</div>
-                            <div class="text-[11px] text-zinc-300 mt-1">HP: ${m.hp}/${m.maxHp}</div>
-                            <div class="text-[11px] text-zinc-400">攻擊: ${m.atk} | 防禦: ${m.def}</div>
+                            <div class="text-[11px] text-zinc-300 mt-1">${dict.monsterHp}: ${m.hp}/${m.maxHp}</div>
+                            <div class="text-[11px] text-zinc-400">${dict.atk} ${m.atk} | ${dict.def} ${m.def}</div>
                         </div>
                     </div>
                     <div class="bg-apocalypse-950 p-3 rounded border border-apocalypse-800 text-xs font-mono text-zinc-300 max-h-32 overflow-y-auto space-y-1">
@@ -952,10 +1549,10 @@
 
             const optBox = document.getElementById('main-options-box');
             optBox.innerHTML = `
-                <button onclick="executeCombatTurn('attack')" class="p-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-lg text-xs">⚔️ 普通攻擊</button>
-                <button onclick="executeCombatTurn('defend')" class="p-2.5 bg-sky-700 hover:bg-sky-600 text-white font-bold rounded-lg text-xs">🛡️ 舉盾防禦 (減傷50%)</button>
-                <button onclick="executeCombatTurn('bomb')" class="p-2.5 bg-amber-700 hover:bg-amber-600 text-white font-bold rounded-lg text-xs">💣 使用簡易手雷 (90傷害)</button>
-                <button onclick="executeCombatTurn('flee')" class="p-2.5 bg-apocalypse-800 hover:bg-apocalypse-700 text-zinc-300 font-bold rounded-lg text-xs">🏃 嘗試撤退</button>
+                <button onclick="executeCombatTurn('attack')" class="p-2.5 bg-rose-700 hover:bg-rose-600 text-white font-bold rounded-lg text-xs">${dict.btnAtk}</button>
+                <button onclick="executeCombatTurn('defend')" class="p-2.5 bg-sky-700 hover:bg-sky-600 text-white font-bold rounded-lg text-xs">${dict.btnDef}</button>
+                <button onclick="executeCombatTurn('bomb')" class="p-2.5 bg-amber-700 hover:bg-amber-600 text-white font-bold rounded-lg text-xs">${dict.btnBomb}</button>
+                <button onclick="executeCombatTurn('flee')" class="p-2.5 bg-apocalypse-800 hover:bg-apocalypse-700 text-zinc-300 font-bold rounded-lg text-xs">${dict.btnFlee}</button>
             `;
         }
 
@@ -965,38 +1562,35 @@
 
             if (action === 'flee') {
                 if (Math.random() < 0.6) {
-                    alert("撤退成功！回到庇護所。");
-                    advanceStory(30, -2, -2, -5, "你成功撤退回到了庇護所。");
+                    alert("Retreated!");
+                    advanceStory(30, -2, -2, -5, "Retreated safely.");
                     return;
-                } else { currentCombat.logs.push("撤退失敗！被迫留在原地！"); }
+                } else { currentCombat.logs.push("Flee failed!"); }
             } else if (action === 'bomb') {
                 const bomb = gameState.inventory.find(i => i.id === 'bomb');
                 if (bomb) {
                     removeItemFromInventory('bomb', 1);
                     m.hp = Math.max(0, m.hp - 90);
-                    currentCombat.logs.push(`投擲了【簡易手雷】！引爆造成 90 點毀滅性傷害！`);
-                } else { currentCombat.logs.push("背包中沒有簡易手雷！"); }
+                    currentCombat.logs.push(`Bomb exploded! Dealt 90 damage!`);
+                } else { currentCombat.logs.push("No bomb in inventory!"); }
             } else if (action === 'attack') {
                 let isCrit = Math.random() < (0.05 + p.dex * 0.02);
                 let dmgToMonster = Math.max(1, p.atk - m.def);
                 if (isCrit) dmgToMonster = Math.floor(dmgToMonster * 1.8);
                 m.hp = Math.max(0, m.hp - dmgToMonster);
-                currentCombat.logs.push(`你對【${m.name}】造成了 ${dmgToMonster} 點傷害${isCrit ? ' (暴擊！)' : ''}！`);
+                currentCombat.logs.push(`Dealt ${dmgToMonster} damage ${isCrit ? '(CRIT!)' : ''}!`);
             }
 
             if (m.hp <= 0) {
-                let dropText = "";
                 if (currentCombat.isMainBoss) {
-                    addItemToInventory('alloy', '合金板材', 'tool', 2, '高階防具材料');
-                    addItemToInventory('chip', '高階晶片', 'tool', 1, '高科技材料');
-                    dropText = " [BOSS戰利品：合金板材x2 & 高階晶片x1！]";
+                    addItemToInventory('alloy', 'tool', 2);
+                    addItemToInventory('chip', 'tool', 1);
                 } else if (currentCombat.isMiniBoss) {
-                    addItemToInventory('iron', '精鍛鐵塊', 'tool', 2, '防具材料');
-                    addItemToInventory('leather', '變異皮革', 'tool', 2, '防具材料');
-                    dropText = " [小BOSS戰利品：精鍛鐵塊x2 & 變異皮革x2！]";
+                    addItemToInventory('iron', 'tool', 2);
+                    addItemToInventory('leather', 'tool', 2);
                 }
 
-                currentCombat.logs.push(`🎉 順利通關第 ${currentCombat.stage} 關！擊敗【${m.name}】！獲得 XP+${m.xpReward}，金幣+${m.goldReward}！${dropText}`);
+                currentCombat.logs.push(`🎉 Defeated ${m.name}! XP+${m.xpReward}, Gold+${m.goldReward}!`);
                 gainXp(m.xpReward);
                 gameState.currencies.gold += m.goldReward;
                 gameState.dungeonStage += 1;
@@ -1004,11 +1598,7 @@
                 const q2 = gameState.quests.find(q => q.id === 'mq2');
                 if (q2 && q2.status === '進行中') q2.status = '可領取';
 
-                const ach = gameState.achievements.find(a => a.id === 'a2');
-                if (ach) ach.unlocked = true;
-
-                alert(`🎉 恭喜通關第 ${currentCombat.stage} 關！獲得 XP+${m.xpReward}，金幣+${m.goldReward}！${dropText}\n已解鎖第 ${gameState.dungeonStage} 關！`);
-                advanceStory(45, -5, -5, -10, `你成功消滅了【${m.name}】，順利通過第 ${currentCombat.stage} 關！`);
+                advanceStory(45, -5, -5, -10, `Cleared Stage ${currentCombat.stage}!`);
                 return;
             }
 
@@ -1016,10 +1606,10 @@
                 let monsterDmg = Math.max(1, m.atk - p.def);
                 if (action === 'defend') monsterDmg = Math.floor(monsterDmg * 0.4);
                 p.stamina = Math.max(0, p.stamina - monsterDmg);
-                currentCombat.logs.push(`【${m.name}】反擊！對你造成了 ${monsterDmg} 點傷害！`);
+                currentCombat.logs.push(`${m.name} hit you for ${monsterDmg} damage!`);
 
                 if (p.stamina <= 0) {
-                    triggerDefeatEnding(`在第 ${currentCombat.stage} 關與強大怪物的生死搏鬥中力竭身亡。`);
+                    triggerDefeatEnding("Died in battle.");
                     return;
                 }
             }
@@ -1029,7 +1619,7 @@
             updateRightStatusPanel();
         }
 
-        /* ================= TIME, HAZARD & 24:00 MANDATORY SLEEP ENGINE ================= */
+        /* ================= TIME & MANDATORY SLEEP ENGINE ================= */
         function advanceTime(minutes) {
             let oldPeriod = gameState.time.period;
             gameState.time.minute += minutes;
@@ -1073,28 +1663,27 @@
             gameState.player.satiety = Math.max(0, gameState.player.satiety - 20);
             gameState.player.thirst = Math.max(0, gameState.player.thirst - 25);
 
-            // 環境災害觸發檢測 (沒穿 T2 以上盔甲扣血)
             let hazardMsg = "";
             const bestArmor = getHighestEquippedArmor();
-            if (Math.random() < 0.35) { // 35% 幾率環境災害
+            if (Math.random() < 0.35) {
                 if (!bestArmor || bestArmor.id === 'armor_t1') {
                     adjustStats(-10, -10, -25);
-                    hazardMsg = "\n⚠️【極端寒潮襲來】由於缺乏 T2 以上高階護甲保護，你遭受了凍傷，體力與飽食度額外受損！";
+                    hazardMsg = "\n⚠️ Blizzard Hazard: Lack of T2+ Armor! Lost stats!";
                 } else {
-                    hazardMsg = `\n🛡️【極端寒潮襲來】幸虧穿戴了【${bestArmor.name}】，你完美抵擋了環境災害！`;
+                    hazardMsg = `\n🛡️ Weather Hazard: Protected by armor!`;
                 }
             }
 
-            alert(`🌙 時間已過午夜 24:00！你疲憊不堪地進入睡夢中，一覺睡到了次日清晨 08:00！\n體力與精神已恢復！${hazardMsg}`);
+            alert(`🌙 Midnight 24:00! Slept until 08:00 next day.${hazardMsg}`);
 
             updateRightStatusPanel();
             if (gameState.time.day > 30) { triggerVictoryEnding(); return; }
-            advanceStory(0, 0, 0, 0, "全新的一天開啟了！" + hazardMsg);
+            advanceStory(0, 0, 0, 0, "New day started!" + hazardMsg);
         }
 
         function sleepOrRest(type) {
-            if (type === 'rest1') advanceStory(60, -3, -3, +20, "你閉目休息了 1 小時，恢復了少許體力。");
-            else if (type === 'rest4') advanceStory(240, -10, -12, +50, "你深入休息了 4 小時，體力大幅恢復。");
+            if (type === 'rest1') advanceStory(60, -3, -3, +20, "Rested 1 hour.");
+            else if (type === 'rest4') advanceStory(240, -10, -12, +50, "Rested 4 hours.");
             else if (type === 'sleepNight') triggerMandatorySleep();
         }
 
@@ -1104,9 +1693,9 @@
             const txt = document.getElementById('period-greeting-text');
             const emoji = document.getElementById('period-emoji');
 
-            if (period === '白天') { emoji.innerHTML = "🌅"; txt.innerHTML = "<i>“新的一天開始了，抓緊搜集物資！”</i>"; }
-            else if (period === '黃昏') { emoji.innerHTML = "🌇"; txt.innerHTML = "<i>“黃昏降臨，天光漸暗，注意安全防衛~”</i>"; }
-            else { emoji.innerHTML = "🌙"; txt.innerHTML = "<i>“黑夜籠罩，保持安靜，鎖緊門窗。”</i>"; }
+            if (period === '白天') { emoji.innerHTML = "🌅"; txt.innerHTML = "<i>Daytime!</i>"; }
+            else if (period === '黃昏') { emoji.innerHTML = "🌇"; txt.innerHTML = "<i>Dusk...</i>"; }
+            else { emoji.innerHTML = "🌙"; txt.innerHTML = "<i>Night time...</i>"; }
 
             secGreeting.classList.remove('hidden');
         }
@@ -1123,13 +1712,13 @@
                 lockGame.attempts = 5;
 
                 const modal = document.getElementById('universal-modal');
-                document.getElementById('modal-title').innerHTML = `🔐 密碼鎖破解小遊戲`;
+                document.getElementById('modal-title').innerHTML = `🔐 Lockpick`;
                 document.getElementById('modal-body').innerHTML = `
                     <div class="space-y-4 text-center">
-                        <p class="text-xs text-zinc-300">請猜測 3 位數字密碼（剩餘嘗試次數：<b id="lock-attempts" class="text-amber-400">5</b> 次）</p>
+                        <p class="text-xs text-zinc-300">Guess 3 digits (Attempts: <b id="lock-attempts" class="text-amber-400">5</b>)</p>
                         <input type="text" id="lock-input" maxlength="3" class="bg-apocalypse-950 border border-amber-500 rounded px-4 py-2 text-center text-xl font-mono text-amber-400 focus:outline-none" placeholder="123">
                         <div id="lock-feedback" class="text-xs text-zinc-400 min-h-[20px]"></div>
-                        <button onclick="submitLockGuess()" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded text-xs">嘗試開鎖</button>
+                        <button onclick="submitLockGuess()" class="w-full py-2 bg-amber-600 text-zinc-950 font-bold rounded text-xs">Unlock</button>
                     </div>
                 `;
                 modal.classList.remove('hidden');
@@ -1138,7 +1727,7 @@
 
         function submitLockGuess() {
             const input = document.getElementById('lock-input').value.trim();
-            if (input.length !== 3) { document.getElementById('lock-feedback').innerText = "請輸入 3 位數字！"; return; }
+            if (input.length !== 3) return;
 
             lockGame.attempts -= 1;
             document.getElementById('lock-attempts').innerText = lockGame.attempts;
@@ -1147,17 +1736,17 @@
                 gameState.currencies.gold += 300;
                 gameState.currencies.diamond += 3;
                 gainXp(60);
-                alert("🎉 密碼正確！密碼箱成功開啟！獲得 300 金幣、3 鑽石與 60 XP！");
+                alert("🎉 Unlocked! Gold +300, Diamond +3, XP +60!");
                 closeModal();
                 updateRightStatusPanel();
                 return;
             }
 
-            let hint = parseInt(input) < parseInt(lockGame.targetCode) ? "密碼比這個數字【更大】！" : "密碼比這個數字【更小】！";
+            let hint = parseInt(input) < parseInt(lockGame.targetCode) ? "Higher!" : "Lower!";
             document.getElementById('lock-feedback').innerText = hint;
 
             if (lockGame.attempts <= 0) {
-                alert(`❌ 嘗試次數耗盡！破解失敗！正解為 ${lockGame.targetCode}`);
+                alert(`❌ Failed! Code was ${lockGame.targetCode}`);
                 closeModal();
             }
         }
@@ -1165,7 +1754,7 @@
         function triggerRandomEvent() {
             const randomEvt = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
             document.getElementById('sec-main-game').classList.remove('hidden');
-            document.getElementById('main-chapter-title').innerHTML = `【隨機驚喜考驗】`;
+            document.getElementById('main-chapter-title').innerHTML = `【Random Event】`;
             document.getElementById('main-story-text').innerHTML = `
                 <div class="p-3 bg-indigo-950/60 border border-indigo-500/50 rounded-lg space-y-2">
                     <div class="font-bold text-amber-400 text-sm">${randomEvt.title}</div>
@@ -1177,7 +1766,7 @@
             optBox.innerHTML = "";
             randomEvt.options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
-                btn.className = "p-3 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left text-xs text-zinc-200";
+                btn.className = "p-3 bg-apocalypse-950 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left text-xs text-zinc-200";
                 btn.innerHTML = `<span class="font-bold text-amber-400 mr-2">${String.fromCharCode(65 + idx)}.</span> ${opt.text}`;
                 btn.onclick = () => opt.action();
                 optBox.appendChild(btn);
@@ -1187,13 +1776,13 @@
         function showEventResult(resultText) {
             document.getElementById('main-story-text').innerHTML += `
                 <div class="p-2.5 bg-emerald-950/80 border-l-4 border-emerald-500 text-emerald-300 text-xs mt-3 fade-in">
-                    <b>[事件結果]</b> ${resultText}
+                    <b>[Result]</b> ${resultText}
                 </div>
             `;
             const optBox = document.getElementById('main-options-box');
             optBox.innerHTML = `
-                <button onclick="advanceStory(15, -2, -2, -2, '完成了隨機事件處置。')" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">
-                    完成事件，回到主線探索 <i class="fa-solid fa-arrow-right ml-1"></i>
+                <button onclick="advanceStory(15, -2, -2, -2, 'Event completed.')" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded-lg text-xs">
+                    Continue <i class="fa-solid fa-arrow-right ml-1"></i>
                 </button>
             `;
         }
@@ -1210,9 +1799,9 @@
             gameState.player.age = document.getElementById('select-age').value;
             gameState.player.talent = document.getElementById('select-talent').value;
 
-            if (gameState.player.talent === '強壯') gameState.player.str += 3;
-            if (gameState.player.talent === '靈敏') gameState.player.dex += 3;
-            if (gameState.player.talent === '堅韌') gameState.player.vit += 3;
+            if (gameState.player.talent.includes('強壯') || gameState.player.talent.includes('Strong')) gameState.player.str += 3;
+            if (gameState.player.talent.includes('靈敏') || gameState.player.talent.includes('Agile')) gameState.player.dex += 3;
+            if (gameState.player.talent.includes('堅韌') || gameState.player.talent.includes('Tough')) gameState.player.vit += 3;
 
             recalculatePlayerStats();
             document.getElementById('confirm-modal').classList.remove('hidden');
@@ -1224,7 +1813,7 @@
 
         function selectFaction(factionName) {
             gameState.player.faction = factionName;
-            if (factionName === '保守型') gameState.player.vit += 2;
+            if (factionName.includes('保守') || factionName.includes('Conservative')) gameState.player.vit += 2;
             else gameState.player.str += 2;
 
             recalculatePlayerStats();
@@ -1239,37 +1828,29 @@
                 mobileToggles.classList.add('flex', 'lg:hidden');
             }
 
-            renderStoryNode(1, "第一章：初露端倪", "09:30", 
-                `你建立了<b>【${factionName}】</b>求生路線。警報聲歸於死寂，當前需儘快完成任務與闖關！`,
-                [
-                    { text: `⚔️ [闖關打怪] 挑戰第 ${gameState.dungeonStage} 關怪物`, action: () => startMonsterBattle() },
-                    { text: "🧱 [保守] 固守庇護所，檢查並加固防線", action: () => advanceStory(30, -3, -3, +10, "你加固了房門，庇護所防禦增強。") },
-                    { text: "😴 [休息] 閉目休息 1 小時恢復體力", action: () => sleepOrRest('rest1') },
-                    { text: "🌙 [睡眠] 一鍵睡覺至次日 08:00", action: () => sleepOrRest('sleepNight') },
-                    { text: "🔍 [搜尋] 外出搜尋物資 (獲得材料與奇特寶物)", action: () => scavengeSupplies() },
-                    { text: "📻 [電台] 電台通訊其他避難者 (解鎖好壞事件與交易)", action: () => radioCommunication() },
-                    { text: "🔨 [工作台] 打開工作台合成5級防禦盔甲", action: () => openPanel('workbench') },
-                    { text: "🛒 [商城] 打開商城購買食品與水", action: () => openPanel('shop') }
-                ]
-            );
+            const hourStr = "09:30";
+            renderDefaultOptions(`Faction <b>【${factionName}】</b> chosen. Prepare for survival!`, hourStr);
         }
 
         function renderStoryNode(day, chapterTitle, timeStr, storyHtml, choices) {
-            document.getElementById('sec-main-game').classList.remove('hidden');
-            document.getElementById('main-chapter-title').innerHTML = `【${chapterTitle}】`;
-            document.getElementById('main-chapter-time').innerText = `Day ${gameState.time.day} · ${timeStr}`;
-            document.getElementById('main-story-text').innerHTML = storyHtml;
+            const mainGameSec = document.getElementById('sec-main-game');
+            if (mainGameSec) mainGameSec.classList.remove('hidden');
+
+            setElemHTML('main-chapter-title', `【${chapterTitle}】`);
+            setElemText('main-chapter-time', `Day ${gameState.time.day} · ${timeStr}`);
+            setElemHTML('main-story-text', storyHtml);
 
             const optBox = document.getElementById('main-options-box');
-            optBox.innerHTML = "";
-
-            choices.forEach((c, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "p-3 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left transition text-xs sm:text-sm text-zinc-200 shadow";
-                btn.innerHTML = `<span class="font-bold text-amber-400 mr-1.5">${String.fromCharCode(65 + idx)}.</span> ${c.text}`;
-                btn.onclick = () => c.action();
-                optBox.appendChild(btn);
-            });
+            if (optBox) {
+                optBox.innerHTML = "";
+                choices.forEach((c, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "p-3 bg-apocalypse-950 hover:bg-apocalypse-800 border border-apocalypse-700 hover:border-amber-500 rounded-lg text-left transition text-xs sm:text-sm text-zinc-200 shadow";
+                    btn.innerHTML = `<span class="font-bold text-amber-400 mr-1.5">${String.fromCharCode(65 + idx)}.</span> ${c.text}`;
+                    btn.onclick = () => c.action();
+                    optBox.appendChild(btn);
+                });
+            }
         }
 
         function advanceStory(minutesCost, satDelta, thirstDelta, staminaDelta, resultText) {
@@ -1277,24 +1858,9 @@
             const timeOk = advanceTime(minutesCost);
             if (!timeOk) return;
 
-            const nextDay = gameState.time.day;
             const hourStr = `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`;
-
-            let title = `第${nextDay}天：生存考驗`;
-            let plot = `${resultText}<br><br>時間來到 ${hourStr}。你需要做出新的抉擇：`;
-            
-            let choices = [
-                { text: `⚔️ [闖關打怪] 挑戰第 ${gameState.dungeonStage} 關怪物`, action: () => startMonsterBattle() },
-                { text: "🧱 [保守] 固守房門，加固庇護所", action: () => advanceStory(30, -3, -3, +10, "你加固了房門，庇護所防禦穩定。") },
-                { text: "😴 [休息] 閉目休息 4 小時補充精力", action: () => sleepOrRest('rest4') },
-                { text: "🌙 [睡眠] 一鍵睡覺至次日 08:00", action: () => sleepOrRest('sleepNight') },
-                { text: "🔍 [搜尋] 外出搜尋物資 (獲得材料與奇特寶物)", action: () => scavengeSupplies() },
-                { text: "📻 [電台] 電台通訊其他避難者 (解鎖好壞事件與交易)", action: () => radioCommunication() },
-                { text: "🔨 [工作台] 打開工作台合成5級防禦盔甲", action: () => openPanel('workbench') },
-                { text: "🛒 [商城] 打開商城購買食品與水", action: () => openPanel('shop') }
-            ];
-
-            renderStoryNode(nextDay, title, hourStr, plot, choices);
+            let plot = `${resultText}<br><br>Time: ${hourStr}`;
+            renderDefaultOptions(plot, hourStr);
         }
 
         /* ================= INVENTORY & STATUS PANELS ================= */
@@ -1321,25 +1887,28 @@
             }
 
             if (filtered.length === 0) {
-                listElem.innerHTML = `<div class="text-zinc-500 italic text-center py-4">無此分類物資</div>`;
+                listElem.innerHTML = `<div class="text-zinc-500 italic text-center py-4">No items</div>`;
                 return;
             }
 
             let html = "";
             filtered.forEach(item => {
+                const iName = getItemTranslation(item.id, 'name') || item.id;
+                const iEffect = getItemTranslation(item.id, 'effect');
                 const isUsable = item.cat === 'food' || item.cat === 'medical' || item.id === 'dirty_duck' || item.id === 'gameboy' || item.id === 'gold_watch';
+                
                 html += `
                     <div class="p-2 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center gap-1.5">
                         <div class="flex-1 min-w-0">
                             <div class="font-bold text-zinc-200 flex items-center justify-between">
-                                <span class="truncate">${item.name}</span>
+                                <span class="truncate">${iName}</span>
                                 <span class="text-amber-400 font-mono ml-1">x${item.qty}</span>
                             </div>
-                            <div class="text-[10px] text-zinc-400 truncate">${item.effect || ''}</div>
+                            <div class="text-[10px] text-zinc-400 truncate">${iEffect}</div>
                         </div>
                         ${isUsable ? `
                             <button onclick="useItemDirectly('${item.id}')" class="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded text-[11px]">
-                                使用/對換
+                                ${I18N[currentLang].useBtn}
                             </button>
                         ` : ''}
                     </div>
@@ -1348,8 +1917,9 @@
             listElem.innerHTML = html;
 
             const totalQty = gameState.inventory.reduce((a, b) => a + b.qty, 0);
-            document.getElementById('inv-capacity-tag').innerText = `容量: ${totalQty}/25`;
-            document.getElementById('inv-capacity-bar').style.width = `${Math.min(100, (totalQty / 25) * 100)}%`;
+            setElemText('inv-capacity-tag', `${I18N[currentLang].invCapacity}: ${totalQty}/25`);
+            const capBar = document.getElementById('inv-capacity-bar');
+            if (capBar) capBar.style.width = `${Math.min(100, (totalQty / 25) * 100)}%`;
         }
 
         function useItemDirectly(itemId) {
@@ -1367,16 +1937,16 @@
             if (itemId === 'herb_salve') gameState.player.injury = Math.max(0, gameState.player.injury - 15);
             if (itemId === 'bandage') gameState.player.injury = Math.max(0, gameState.player.injury - 20);
             if (itemId === 'medkit') { gameState.player.injury = 0; adjustStats(0, 0, +30, +10); }
-            if (itemId === 'gold_watch') { gameState.currencies.gold += 500; alert("賣出懷錶獲得了 500 金幣！"); }
+            if (itemId === 'gold_watch') { gameState.currencies.gold += 500; alert("+500 Gold!"); }
 
             renderLeftInventory();
             updateRightStatusPanel();
         }
 
-        function addItemToInventory(id, name, cat, qty, effect) {
+        function addItemToInventory(id, cat, qty) {
             let item = gameState.inventory.find(i => i.id === id);
             if (item) item.qty += qty;
-            else gameState.inventory.push({ id, name, cat, qty, effect });
+            else gameState.inventory.push({ id, cat, qty });
             renderLeftInventory();
         }
 
@@ -1390,44 +1960,47 @@
         }
 
         function updateRightStatusPanel() {
-            document.getElementById('rt-day').innerText = (31 - gameState.time.day);
-            document.getElementById('rt-time').innerText = `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`;
-            document.getElementById('rt-season').innerText = gameState.time.season;
-            document.getElementById('rt-weather').innerText = gameState.time.weather;
-            document.getElementById('rt-temp').innerText = gameState.time.temp;
+            setElemText('rt-day', (31 - gameState.time.day));
+            setElemText('rt-time', `${String(gameState.time.hour).padStart(2, '0')}:${String(gameState.time.minute).padStart(2, '0')}`);
 
-            document.getElementById('hdr-stage').innerText = gameState.dungeonStage;
-            document.getElementById('hdr-level').innerText = gameState.player.level;
-            document.getElementById('hdr-xp-bar').style.width = `${(gameState.player.xp / gameState.player.maxXp) * 100}%`;
+            setElemText('hdr-stage', gameState.dungeonStage);
+            setElemText('hdr-level', gameState.player.level);
+            const xpBar = document.getElementById('hdr-xp-bar');
+            if (xpBar) xpBar.style.width = `${(gameState.player.xp / gameState.player.maxXp) * 100}%`;
 
-            document.getElementById('rt-level').innerText = gameState.player.level;
-            document.getElementById('rt-atk').innerText = gameState.player.atk;
-            document.getElementById('rt-def').innerText = gameState.player.def;
-            document.getElementById('rt-str').innerText = gameState.player.str;
-            document.getElementById('rt-vit').innerText = gameState.player.vit;
-            document.getElementById('rt-dex').innerText = gameState.player.dex;
-            document.getElementById('rt-statpoints').innerText = gameState.player.statPoints;
+            setElemText('rt-level', gameState.player.level);
+            setElemText('rt-atk', gameState.player.atk);
+            setElemText('rt-def', gameState.player.def);
+            setElemText('rt-str', gameState.player.str);
+            setElemText('rt-vit', gameState.player.vit);
+            setElemText('rt-dex', gameState.player.dex);
+            setElemText('rt-statpoints', gameState.player.statPoints);
 
-            document.getElementById('txt-satiety').innerText = `${gameState.player.satiety}/100`;
-            document.getElementById('bar-satiety').style.width = `${gameState.player.satiety}%`;
+            setElemText('txt-satiety', `${gameState.player.satiety}/100`);
+            const barSat = document.getElementById('bar-satiety');
+            if (barSat) barSat.style.width = `${gameState.player.satiety}%`;
 
-            document.getElementById('txt-thirst').innerText = `${gameState.player.thirst}/100`;
-            document.getElementById('bar-thirst').style.width = `${gameState.player.thirst}%`;
+            setElemText('txt-thirst', `${gameState.player.thirst}/100`);
+            const barThirst = document.getElementById('bar-thirst');
+            if (barThirst) barThirst.style.width = `${gameState.player.thirst}%`;
 
-            document.getElementById('txt-stamina').innerText = `${gameState.player.stamina}/${gameState.player.maxStamina}`;
-            document.getElementById('bar-stamina').style.width = `${(gameState.player.stamina / gameState.player.maxStamina) * 100}%`;
+            setElemText('txt-stamina', `${gameState.player.stamina}/${gameState.player.maxStamina}`);
+            const barStam = document.getElementById('bar-stamina');
+            if (barStam) barStam.style.width = `${(gameState.player.stamina / gameState.player.maxStamina) * 100}%`;
 
-            document.getElementById('txt-sanity').innerText = `${gameState.player.sanity}/100`;
-            document.getElementById('bar-sanity').style.width = `${gameState.player.sanity}%`;
+            setElemText('txt-sanity', `${gameState.player.sanity}/100`);
+            const barSanity = document.getElementById('bar-sanity');
+            if (barSanity) barSanity.style.width = `${gameState.player.sanity}%`;
 
-            document.getElementById('txt-mood').innerText = `${gameState.player.mood}/100`;
-            document.getElementById('bar-mood').style.width = `${gameState.player.mood}%`;
+            setElemText('txt-mood', `${gameState.player.mood}/100`);
+            const barMood = document.getElementById('bar-mood');
+            if (barMood) barMood.style.width = `${gameState.player.mood}%`;
 
-            document.getElementById('rt-injury-tag').innerText = gameState.player.injury > 0 ? `傷勢 ${gameState.player.injury}%` : '無傷勢';
+            setElemText('rt-injury-tag', gameState.player.injury > 0 ? `Injured ${gameState.player.injury}%` : I18N[currentLang].noInjury);
 
-            document.getElementById('rt-diamond').innerText = gameState.currencies.diamond;
-            document.getElementById('rt-gold').innerText = gameState.currencies.gold;
-            document.getElementById('rt-silver').innerText = gameState.currencies.silver;
+            setElemText('rt-diamond', gameState.currencies.diamond);
+            setElemText('rt-gold', gameState.currencies.gold);
+            setElemText('rt-silver', gameState.currencies.silver);
 
             checkQuestProgress();
         }
@@ -1442,10 +2015,10 @@
             updateRightStatusPanel();
 
             if (p.satiety <= 20 || p.thirst <= 20 || p.stamina <= 15) {
-                triggerRedWarning("警告：身體狀態跌破安全線！請立刻補給或睡覺！");
+                triggerRedWarning("Warning: Health parameters critical!");
             }
             if (p.satiety <= 0 || p.thirst <= 0) {
-                triggerDefeatEnding("因極度飢渴衰竭而失去求生能力。");
+                triggerDefeatEnding("Died of exhaustion and thirst.");
             }
         }
 
@@ -1460,35 +2033,38 @@
 
             const p = gameState.player;
             const bestArmor = getHighestEquippedArmor();
+            const dict = I18N[currentLang];
 
             switch (panelKey) {
                 case 'profile':
-                    titleElem.innerHTML = `<i class="fa-solid fa-id-card text-amber-400"></i> 角色詳細面板`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-id-card text-amber-400"></i> Profile`;
                     bodyElem.innerHTML = `
                         <div class="grid grid-cols-2 gap-3 bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800 text-xs">
-                            <div><b>角色姓名:</b> ${p.name}</div>
-                            <div><b>生理性別:</b> ${p.gender}</div>
-                            <div><b>年齡段:</b> ${p.age}</div>
-                            <div><b>天賦能力:</b> <span class="text-amber-400 font-bold">${p.talent}</span></div>
-                            <div><b>生存派系:</b> <span class="text-emerald-400 font-bold">${p.faction}</span></div>
-                            <div><b>當前等級:</b> <span class="text-amber-400 font-bold">Lv.${p.level}</span></div>
-                            <div><b>當前關卡:</b> <span class="text-rose-400 font-bold">第 ${gameState.dungeonStage} 關</span></div>
-                            <div><b>裝備盔甲:</b> <span class="text-sky-400 font-bold">${bestArmor ? bestArmor.name : '無'}</span></div>
-                            <div><b>物理攻擊:</b> <span class="text-rose-400 font-bold">${p.atk}</span></div>
-                            <div><b>物理防禦:</b> <span class="text-sky-400 font-bold">${p.def}</span></div>
+                            <div><b>Name:</b> ${p.name}</div>
+                            <div><b>Gender:</b> ${p.gender}</div>
+                            <div><b>Age:</b> ${p.age}</div>
+                            <div><b>Talent:</b> <span class="text-amber-400 font-bold">${p.talent}</span></div>
+                            <div><b>Faction:</b> <span class="text-emerald-400 font-bold">${p.faction}</span></div>
+                            <div><b>Level:</b> <span class="text-amber-400 font-bold">Lv.${p.level}</span></div>
+                            <div><b>Stage:</b> <span class="text-rose-400 font-bold">Stage ${gameState.dungeonStage}</span></div>
+                            <div><b>Armor:</b> <span class="text-sky-400 font-bold">${bestArmor ? getItemTranslation(bestArmor.id, 'name') : 'None'}</span></div>
+                            <div><b>ATK:</b> <span class="text-rose-400 font-bold">${p.atk}</span></div>
+                            <div><b>DEF:</b> <span class="text-sky-400 font-bold">${p.def}</span></div>
                         </div>
                     `;
                     break;
 
                 case 'backpack':
-                    titleElem.innerHTML = `<i class="fa-solid fa-box text-emerald-400"></i> 背包全量圖鑑`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-box text-emerald-400"></i> ${dict.pbtnBackpack}`;
                     let invHtml = `<div class="space-y-2">`;
                     gameState.inventory.forEach(item => {
+                        const iName = getItemTranslation(item.id, 'name') || item.id;
+                        const iEffect = getItemTranslation(item.id, 'effect');
                         invHtml += `
                             <div class="p-3 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center text-xs">
                                 <div>
-                                    <div class="font-bold text-zinc-200">${item.name} <span class="text-amber-400 font-mono">x${item.qty}</span></div>
-                                    <div class="text-[11px] text-zinc-400 mt-0.5">${item.effect || '無特殊效果'}</div>
+                                    <div class="font-bold text-zinc-200">${iName} <span class="text-amber-400 font-mono">x${item.qty}</span></div>
+                                    <div class="text-[11px] text-zinc-400 mt-0.5">${iEffect}</div>
                                 </div>
                             </div>
                         `;
@@ -1498,28 +2074,21 @@
                     break;
 
                 case 'quests':
-                    titleElem.innerHTML = `<i class="fa-solid fa-list-check text-yellow-400"></i> 生存任務指南`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-list-check text-yellow-400"></i> Quests`;
                     let qHtml = `<div class="space-y-2">`;
                     gameState.quests.forEach(q => {
-                        let statusBadge = "";
-                        if (q.status === '可領取') {
-                            statusBadge = `<button onclick="claimQuestReward('${q.id}')" class="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded text-xs alert-pulse">🎁 領取獎勵</button>`;
-                        } else if (q.status === '已領取') {
-                            statusBadge = `<span class="text-xs text-emerald-400 font-bold">[已完成領取]</span>`;
-                        } else if (q.status === '進行中') {
-                            statusBadge = `<span class="text-xs text-amber-400 font-bold">[進行中]</span>`;
-                        } else {
-                            statusBadge = `<span class="text-xs text-zinc-500">[未解鎖]</span>`;
-                        }
+                        let statusBadge = (q.status === '可領取') ? 
+                            `<button onclick="claimQuestReward('${q.id}')" class="px-3 py-1 bg-amber-500 text-zinc-950 font-bold rounded text-xs alert-pulse">Claim Reward</button>` :
+                            `<span class="text-xs text-amber-400 font-bold">[${q.status}]</span>`;
 
                         qHtml += `
                             <div class="p-3 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center gap-2 text-xs">
                                 <div>
                                     <div class="font-bold text-zinc-200">${q.title}</div>
                                     <div class="text-zinc-400 mt-0.5">${q.desc}</div>
-                                    <div class="text-amber-400/80 mt-1">獎勵: ${q.reward}</div>
+                                    <div class="text-amber-400/80 mt-1">Reward: ${q.reward}</div>
                                 </div>
-                                <div class="whitespace-nowrap">${statusBadge}</div>
+                                <div>${statusBadge}</div>
                             </div>
                         `;
                     });
@@ -1528,7 +2097,7 @@
                     break;
 
                 case 'workbench':
-                    titleElem.innerHTML = `<i class="fa-solid fa-screws-wrench text-amber-400"></i> 5級盔甲與極限工作台`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-screws-wrench text-amber-400"></i> Workbench`;
                     let wbHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">`;
                     WORKBENCH_RECIPES.forEach(recipe => {
                         let canCraft = true;
@@ -1536,19 +2105,19 @@
                             const playerItem = gameState.inventory.find(i => i.id === mat.id);
                             const currentQty = playerItem ? playerItem.qty : 0;
                             if (currentQty < mat.qty) canCraft = false;
-                            const qtyColor = currentQty >= mat.qty ? 'text-emerald-400' : 'text-rose-400';
-                            return `<span class="inline-block bg-apocalypse-900 px-2 py-0.5 rounded text-[11px]">${mat.name}: <b class="${qtyColor}">${currentQty}/${mat.qty}</b></span>`;
+                            const mName = getItemTranslation(mat.id, 'name') || mat.name;
+                            return `<span class="inline-block bg-apocalypse-900 px-2 py-0.5 rounded text-[11px]">${mName}: <b class="${currentQty >= mat.qty ? 'text-emerald-400' : 'text-rose-400'}">${currentQty}/${mat.qty}</b></span>`;
                         }).join(' ');
 
                         wbHtml += `
                             <div class="p-3 bg-apocalypse-950 border border-apocalypse-800 rounded-lg space-y-2 flex flex-col justify-between text-xs">
                                 <div>
-                                    <div class="font-bold text-amber-400 text-sm">${recipe.name}</div>
-                                    <div class="text-zinc-300 mt-1">${recipe.desc}</div>
-                                    <div class="mt-2"><b>需要材料:</b> ${matReqHtml}</div>
+                                    <div class="font-bold text-amber-400 text-sm">${getItemTranslation(recipe.output.id, 'name') || recipe.name}</div>
+                                    <div class="text-zinc-300 mt-1">${getItemTranslation(recipe.output.id, 'effect') || recipe.desc}</div>
+                                    <div class="mt-2"><b>Need:</b> ${matReqHtml}</div>
                                 </div>
-                                <button onclick="craftItem('${recipe.id}')" class="mt-2 w-full py-1.5 ${canCraft ? 'bg-amber-600 hover:bg-amber-500 text-zinc-950' : 'bg-apocalypse-800 text-zinc-500 cursor-not-allowed'} font-bold rounded text-xs">
-                                    ${canCraft ? '🔨 點擊合成' : '材料不足'}
+                                <button onclick="craftItem('${recipe.id}')" class="mt-2 w-full py-1.5 ${canCraft ? 'bg-amber-600 text-zinc-950' : 'bg-apocalypse-800 text-zinc-500 cursor-not-allowed'} font-bold rounded text-xs">
+                                    ${canCraft ? dict.craftBtn : dict.matShort}
                                 </button>
                             </div>
                         `;
@@ -1558,28 +2127,27 @@
                     break;
 
                 case 'stats':
-                    titleElem.innerHTML = `<i class="fa-solid fa-heart-pulse text-rose-400"></i> 生理體徵數據`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-heart-pulse text-rose-400"></i> Vitals`;
                     bodyElem.innerHTML = `
                         <div class="space-y-3 bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800 text-xs">
-                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>飽食度:</span><b class="text-amber-400">${p.satiety}/100</b></div>
-                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>水分值:</span><b class="text-sky-400">${p.thirst}/100</b></div>
-                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>體力上限:</span><b class="text-emerald-400">${p.stamina}/${p.maxStamina}</b></div>
-                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>精神值:</span><b class="text-purple-400">${p.sanity}/100</b></div>
-                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>心情值:</span><b class="text-yellow-400">${p.mood}/100</b></div>
-                            <div class="flex justify-between"><span>當前傷勢:</span><b class="text-rose-400">${p.injury > 0 ? p.injury + '%' : '無傷勢'}</b></div>
+                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>Satiety:</span><b class="text-amber-400">${p.satiety}/100</b></div>
+                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>Hydration:</span><b class="text-sky-400">${p.thirst}/100</b></div>
+                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>Stamina:</span><b class="text-emerald-400">${p.stamina}/${p.maxStamina}</b></div>
+                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>Sanity:</span><b class="text-purple-400">${p.sanity}/100</b></div>
+                            <div class="flex justify-between border-b border-apocalypse-800 pb-1"><span>Mood:</span><b class="text-yellow-400">${p.mood}/100</b></div>
+                            <div class="flex justify-between"><span>Injury:</span><b class="text-rose-400">${p.injury > 0 ? p.injury + '%' : 'Healthy'}</b></div>
                         </div>
                     `;
                     break;
 
                 case 'npcs':
-                    titleElem.innerHTML = `<i class="fa-solid fa-users text-indigo-400"></i> NPC 關係網絡`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-users text-indigo-400"></i> NPCs`;
                     let npcHtml = `<div class="space-y-2">`;
                     Object.values(gameState.npcs).forEach(npc => {
                         npcHtml += `
                             <div class="p-3 bg-apocalypse-950 border border-apocalypse-800 rounded text-xs space-y-1">
-                                <div class="font-bold text-amber-400 text-sm">${npc.name} <span class="text-xs text-zinc-400">(${npc.relation} · 好感度 ${npc.score})</span></div>
+                                <div class="font-bold text-amber-400 text-sm">${npc.name} (${npc.relation})</div>
                                 <div class="text-zinc-300">${npc.bio}</div>
-                                <div class="text-rose-400 font-semibold">當前需求: ${npc.req || '無'}</div>
                             </div>
                         `;
                     });
@@ -1588,17 +2156,19 @@
                     break;
 
                 case 'shop':
-                    titleElem.innerHTML = `<i class="fa-solid fa-store text-amber-400"></i> 物資商城 & 黑市`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-store text-amber-400"></i> Shop`;
                     let shopHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
                     SHOP_ITEMS.forEach(item => {
+                        const sName = getItemTranslation(item.id, 'name');
+                        const sDesc = getItemTranslation(item.id, 'effect');
                         shopHtml += `
                             <div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded flex justify-between items-center text-xs">
                                 <div>
-                                    <div class="font-bold text-zinc-200">${item.name}</div>
-                                    <div class="text-[11px] text-zinc-400">${item.desc}</div>
+                                    <div class="font-bold text-zinc-200">${sName}</div>
+                                    <div class="text-[11px] text-zinc-400">${sDesc}</div>
                                 </div>
-                                <button onclick="buyShopItem('${item.id}')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold rounded text-xs">
-                                    ${item.price} 金幣
+                                <button onclick="buyShopItem('${item.id}')" class="px-3 py-1.5 bg-amber-600 text-zinc-950 font-bold rounded text-xs">
+                                    ${item.price} ${dict.buyBtn}
                                 </button>
                             </div>
                         `;
@@ -1608,45 +2178,44 @@
                     break;
 
                 case 'map':
-                    titleElem.innerHTML = `<i class="fa-solid fa-map-location-dot text-emerald-500"></i> 末日探索地圖`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-map-location-dot text-emerald-500"></i> Map`;
                     bodyElem.innerHTML = `
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                             <div class="p-3 bg-apocalypse-950 border border-emerald-500/40 rounded">
-                                <div class="font-bold text-emerald-400">🏠 庇護所安全區</div>
-                                <div class="text-zinc-400 mt-1">危險度: 0% · 適合休養與加固</div>
+                                <div class="font-bold text-emerald-400">🏠 Shelter Base</div>
+                                <div class="text-zinc-400 mt-1">Danger: 0%</div>
                             </div>
                             <div class="p-3 bg-apocalypse-950 border border-amber-500/40 rounded">
-                                <div class="font-bold text-amber-400">🏚️ 闖關打怪廢墟區</div>
-                                <div class="text-zinc-400 mt-1">當前進度: 第 ${gameState.dungeonStage} 關</div>
+                                <div class="font-bold text-amber-400">🏚️ Ruins & Dungeon</div>
+                                <div class="text-zinc-400 mt-1">Current Progress: Stage ${gameState.dungeonStage}</div>
                             </div>
                         </div>
                     `;
                     break;
 
                 case 'shelter':
-                    titleElem.innerHTML = `<i class="fa-solid fa-house-shield text-teal-400"></i> 庇護所升級與防線`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-house-shield text-teal-400"></i> Shelter`;
                     bodyElem.innerHTML = `
                         <div class="p-4 bg-apocalypse-950 border border-apocalypse-800 rounded space-y-3 text-xs">
                             <div class="font-bold text-amber-400 text-sm">${gameState.shelter.name}</div>
-                            <div>防禦耐久: <b class="text-emerald-400">${gameState.shelter.durability}/100</b></div>
-                            <div>隱蔽數值: <b class="text-sky-400">${gameState.shelter.stealth}/100</b></div>
-                            <button onclick="gameState.shelter.durability=Math.min(100, gameState.shelter.durability+15); updateRightStatusPanel(); alert('耗費材料成功加固門窗！');" class="px-3 py-1.5 bg-teal-600 text-white rounded font-bold">加固防線 (+15耐久)</button>
+                            <div>Durability: <b class="text-emerald-400">${gameState.shelter.durability}/100</b></div>
+                            <div>Stealth: <b class="text-sky-400">${gameState.shelter.stealth}/100</b></div>
+                            <button onclick="gameState.shelter.durability=Math.min(100, gameState.shelter.durability+15); updateRightStatusPanel(); alert('Reinforced!');" class="px-3 py-1.5 bg-teal-600 text-white rounded font-bold">Reinforce (+15 Durability)</button>
                         </div>
                     `;
                     break;
 
                 case 'forecast':
-                    titleElem.innerHTML = `<i class="fa-solid fa-sun text-yellow-300"></i> 天氣預報`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-sun text-yellow-300"></i> Weather`;
                     bodyElem.innerHTML = `
                         <div class="p-3 bg-apocalypse-950 border border-apocalypse-800 rounded text-xs space-y-2">
-                            <div>今日天氣: <b class="text-amber-400">${gameState.time.season} · ${gameState.time.weather}</b> (${gameState.time.temp}℃)</div>
-                            <div class="text-zinc-400">環境警告: 隨機極寒寒潮與酸雨襲來，請務必打造 T2 以上盔甲防護！</div>
+                            <div>Weather: <b class="text-amber-400">${gameState.time.season} · ${gameState.time.weather}</b> (${gameState.time.temp}℃)</div>
                         </div>
                     `;
                     break;
 
                 case 'achievements':
-                    titleElem.innerHTML = `<i class="fa-solid fa-medal text-amber-300"></i> 遊戲成就列表`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-medal text-amber-300"></i> Badges`;
                     let achHtml = `<div class="space-y-2">`;
                     gameState.achievements.forEach(a => {
                         achHtml += `
@@ -1655,7 +2224,7 @@
                                     <div class="font-bold ${a.unlocked ? 'text-amber-400' : 'text-zinc-500'}">${a.title}</div>
                                     <div class="text-zinc-400">${a.desc}</div>
                                 </div>
-                                <div>${a.unlocked ? '<span class="text-emerald-400 font-bold">已解鎖</span>' : '<span class="text-zinc-600">未達成</span>'}</div>
+                                <div>${a.unlocked ? '<span class="text-emerald-400 font-bold">Unlocked</span>' : '<span class="text-zinc-600">Locked</span>'}</div>
                             </div>
                         `;
                     });
@@ -1664,39 +2233,36 @@
                     break;
 
                 case 'codex':
-                    titleElem.innerHTML = `<i class="fa-solid fa-book-atlas text-purple-400"></i> 末日圖鑑百科`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-book-atlas text-purple-400"></i> Codex`;
                     bodyElem.innerHTML = `
                         <div class="space-y-2 text-xs">
                             <div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded">
-                                <b class="text-sky-400">防禦盔甲圖鑑:</b> 布衣(T1) ➜ 熟皮(T2) ➜ 鐵甲(T3) ➜ 合金(T4) ➜ 動力外骨骼(T5)。
-                            </div>
-                            <div class="p-2.5 bg-apocalypse-950 border border-apocalypse-800 rounded">
-                                <b class="text-amber-400">BOSS掉落:</b> 每5/10關BOSS必定掉落合金板材與高階晶片。
+                                <b class="text-sky-400">Armor Tier:</b> T1 ➜ T2 ➜ T3 ➜ T4 ➜ T5 (Exoskeleton).
                             </div>
                         </div>
                     `;
                     break;
 
                 case 'level':
-                    titleElem.innerHTML = `<i class="fa-solid fa-chart-line text-cyan-400"></i> RPG等級與屬性點分配`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-chart-line text-cyan-400"></i> Level & Stats`;
                     bodyElem.innerHTML = `
                         <div class="space-y-3 bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800 text-xs">
                             <div class="flex justify-between items-center border-b border-apocalypse-800 pb-2">
                                 <div><b class="text-amber-400 text-base">Lv.${p.level}</b> (XP: ${p.xp}/${p.maxXp})</div>
-                                <div class="text-rose-400 font-bold">可分配屬性點: ${p.statPoints} 點</div>
+                                <div class="text-rose-400 font-bold">Points: ${p.statPoints}</div>
                             </div>
                             <div class="space-y-2">
                                 <div class="flex justify-between items-center bg-apocalypse-900 p-2.5 rounded">
-                                    <div><b>💪 力量 (STR): ${p.str}</b> (攻擊+2/點)</div>
-                                    <button onclick="allocateStat('str')" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded">+1 加點</button>
+                                    <div><b>💪 STR: ${p.str}</b></div>
+                                    <button onclick="allocateStat('str')" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded">+1</button>
                                 </div>
                                 <div class="flex justify-between items-center bg-apocalypse-900 p-2.5 rounded">
-                                    <div><b>🛡️ 體質 (VIT): ${p.vit}</b> (防禦&體力+)</div>
-                                    <button onclick="allocateStat('vit')" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded">+1 加點</button>
+                                    <div><b>🛡️ VIT: ${p.vit}</b></div>
+                                    <button onclick="allocateStat('vit')" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded">+1</button>
                                 </div>
                                 <div class="flex justify-between items-center bg-apocalypse-900 p-2.5 rounded">
-                                    <div><b>⚡ 敏捷 (DEX): ${p.dex}</b> (閃避&暴擊+)</div>
-                                    <button onclick="allocateStat('dex')" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded">+1 加點</button>
+                                    <div><b>⚡ DEX: ${p.dex}</b></div>
+                                    <button onclick="allocateStat('dex')" class="px-3 py-1 bg-amber-600 text-zinc-950 font-bold rounded">+1</button>
                                 </div>
                             </div>
                         </div>
@@ -1704,28 +2270,28 @@
                     break;
 
                 case 'currencies':
-                    titleElem.innerHTML = `<i class="fa-solid fa-coins text-yellow-400"></i> 資產與貨幣詳情`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-coins text-yellow-400"></i> Assets`;
                     bodyElem.innerHTML = `
                         <div class="grid grid-cols-3 gap-2 bg-apocalypse-950 p-4 rounded-lg border border-apocalypse-800 text-center font-mono">
-                            <div class="bg-apocalypse-900 p-2 rounded"><div class="text-xs text-zinc-500">鑽石</div><div class="text-sky-400 font-bold text-lg">${gameState.currencies.diamond}</div></div>
-                            <div class="bg-apocalypse-900 p-2 rounded"><div class="text-xs text-zinc-500">金幣</div><div class="text-amber-400 font-bold text-lg">${gameState.currencies.gold}</div></div>
-                            <div class="bg-apocalypse-900 p-2 rounded"><div class="text-xs text-zinc-500">銀幣</div><div class="text-zinc-300 font-bold text-lg">${gameState.currencies.silver}</div></div>
+                            <div class="bg-apocalypse-900 p-2 rounded"><div class="text-xs text-zinc-500">Diamonds</div><div class="text-sky-400 font-bold text-lg">${gameState.currencies.diamond}</div></div>
+                            <div class="bg-apocalypse-900 p-2 rounded"><div class="text-xs text-zinc-500">Gold</div><div class="text-amber-400 font-bold text-lg">${gameState.currencies.gold}</div></div>
+                            <div class="bg-apocalypse-900 p-2 rounded"><div class="text-xs text-zinc-500">Silver</div><div class="text-zinc-300 font-bold text-lg">${gameState.currencies.silver}</div></div>
                         </div>
                     `;
                     break;
 
                 case 'factions':
-                    titleElem.innerHTML = `<i class="fa-solid fa-shield text-blue-400"></i> 派系聲望`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-shield text-blue-400"></i> Factions`;
                     bodyElem.innerHTML = `
                         <div class="space-y-2 bg-apocalypse-950 p-3 rounded border border-apocalypse-800 text-xs">
-                            <div>🏰 保守派聲望: <b class="text-amber-400">${gameState.factions.conservative}</b></div>
-                            <div>🎒 搜尋派聲望: <b class="text-emerald-400">${gameState.factions.scavenger}</b></div>
+                            <div>Conservative: <b class="text-amber-400">${gameState.factions.conservative}</b></div>
+                            <div>Scavenger: <b class="text-emerald-400">${gameState.factions.scavenger}</b></div>
                         </div>
                     `;
                     break;
 
                 case 'clues':
-                    titleElem.innerHTML = `<i class="fa-solid fa-magnifying-glass text-amber-400"></i> 末日真相線索`;
+                    titleElem.innerHTML = `<i class="fa-solid fa-magnifying-glass text-amber-400"></i> Clues`;
                     let clueHtml = `<div class="space-y-2">`;
                     gameState.clues.forEach(c => {
                         clueHtml += `
@@ -1776,12 +2342,12 @@
             if (q.reward.includes('XP+100')) gainXp(100);
             if (q.reward.includes('鑽石x5')) gameState.currencies.diamond += 5;
             if (q.reward.includes('鑽石x10')) gameState.currencies.diamond += 10;
-            if (q.reward.includes('純淨水x2')) addItemToInventory('water', '純淨水', 'food', 2, '水分 +30');
+            if (q.reward.includes('純淨水x2')) addItemToInventory('water', 'food', 2);
 
             updateQuestRedDot();
             openPanel('quests');
             updateRightStatusPanel();
-            alert(`🎉 成功領取任務【${q.title}】獎勵！`);
+            alert(`🎉 Reward claimed!`);
         }
 
         function craftItem(recipeId) {
@@ -1790,12 +2356,12 @@
 
             for (let mat of recipe.materials) {
                 const item = gameState.inventory.find(i => i.id === mat.id);
-                if (!item || item.qty < mat.qty) { alert(`缺乏材料：【${mat.name}】！`); return; }
+                if (!item || item.qty < mat.qty) { alert(`Lack mat: ${mat.name}`); return; }
             }
 
             for (let mat of recipe.materials) removeItemFromInventory(mat.id, mat.qty);
             const out = recipe.output;
-            addItemToInventory(out.id, out.name, out.cat, out.qty, out.effect);
+            addItemToInventory(out.id, out.cat, out.qty);
 
             const q5 = gameState.quests.find(q => q.id === 'mq5');
             if (q5 && q5.status === '進行中') q5.status = '可領取';
@@ -1804,7 +2370,8 @@
             if (ach) ach.unlocked = true;
 
             recalculatePlayerStats();
-            alert(`🎉 合成成功！獲得【${out.name}】！`);
+            const outName = getItemTranslation(out.id, 'name');
+            alert(`🎉 Crafted: 【${outName}】!`);
             openPanel('workbench');
             updateRightStatusPanel();
         }
@@ -1813,19 +2380,19 @@
             const item = SHOP_ITEMS.find(i => i.id === itemId);
             if (!item) return;
 
-            if (gameState.currencies.gold < item.price) { alert("金幣不足！"); return; }
+            if (gameState.currencies.gold < item.price) { alert("Lack Gold!"); return; }
             gameState.currencies.gold -= item.price;
-            addItemToInventory(item.id, item.name, item.cat, item.qty, item.desc);
-            alert(`購買成功！【${item.name}】已存入背包。`);
+            addItemToInventory(item.id, item.cat, item.qty);
+            const itemName = getItemTranslation(item.id, 'name');
+            alert(`Bought: 【${itemName}】!`);
 
             openPanel('shop');
             updateRightStatusPanel();
         }
 
-        function rewindGame() { alert("已進行節點回溯！"); }
         function closeRedWarning() { document.getElementById('red-warning-modal').classList.add('hidden'); }
-        function triggerVictoryEnding() { alert("🎉 成功存活30天通關！"); }
-        function triggerDefeatEnding(r) { alert(`❌ 遊戲結束：${r}`); location.reload(); }
+        function triggerVictoryEnding() { alert("🎉 Victory! Survived 30 Days!"); }
+        function triggerDefeatEnding(r) { alert(`❌ Game Over: ${r}`); location.reload(); }
         function startNewGame() { location.reload(); }
     </script>
 </body>
